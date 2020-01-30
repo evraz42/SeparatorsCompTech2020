@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using ClientService;
 using JetBrains.Annotations;
 using OpenCvSharp;
 
@@ -28,8 +29,8 @@ namespace VideoHandler
                     {
                         var length = frameImageData.Height * frameImageData.Width;
                         var imageDataBytes = new byte[length];
-                        //
                         Marshal.Copy(frameImageData.ImageData, imageDataBytes, 0, length);
+                        new WebServiceConnector(imageDataBytes).Send();
 
                     }
 
