@@ -1,5 +1,6 @@
 ﻿using DataTypes;
 using JetBrains.Annotations;
+using Newtonsoft.Json;
 using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -12,7 +13,7 @@ namespace ClientService
     {
         [NotNull] private static readonly HttpClient _client = new HttpClient();
         [NotNull] private readonly byte[] _picture;
-        [NotNull] private readonly Uri _uri = new Uri("http://localhost/1004");
+        [NotNull] private readonly Uri _uri = new Uri("http://localhost:51460/prediction");
 
         public WebServiceConnector([NotNull] byte[] data)
         {
@@ -44,11 +45,11 @@ namespace ClientService
         private async Task<HttpResponseMessage> GetResponse()
         {
             using var content = new StringContent(
-                Serializer.Serialize(_picture).ToString(), 
+                JsonConvert.SerializeObject(_picture), 
                 Encoding.UTF8,
                 "application/json");
 
-            return await _client.PutAsync(_uri, content);
+            return await _client.PostAsync(_uri, content);
         }
 
         [NotNull]
@@ -56,7 +57,7 @@ namespace ClientService
         {
             var responseBody = await response.Content.ReadAsStringAsync();
 
-            var separator = Validator.Validate(Serializer.Deserialize(responseBody));
+            var separator = Validator.Validate(JsonConvert.DeserializeObject(responseBody));
             separator.Picture = _picture;
             return separator;
         }
