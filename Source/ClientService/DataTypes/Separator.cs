@@ -5,8 +5,8 @@ namespace DataTypes
 {
     public class Separator
     {
-        [NotNull] [ItemNotNull] public readonly List<Flag> Flags;
-        [NotNull] public byte[] Picture;
+        [NotNull] [ItemNotNull] public List<Flag> Flags { get; set; }
+        [NotNull] public byte[] Picture { get; set; }
 
         public void CreateSeparator()
         {

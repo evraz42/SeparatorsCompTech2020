@@ -26,6 +26,7 @@ namespace ClientService
         public async Task Send()
         {
             Separator separator;
+
             try
             {
                 using var response = await GetResponse();

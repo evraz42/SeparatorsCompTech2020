@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebServiceConnection", "Web
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataTypes", "DataTypes\DataTypes.csproj", "{9B74CE1C-2916-4DA2-B00C-B74926AB7B4C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatabaseController", "DatabaseController\DatabaseController.csproj", "{9071D3FD-3F6C-478C-B307-45F5FEF41296}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{9B74CE1C-2916-4DA2-B00C-B74926AB7B4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9B74CE1C-2916-4DA2-B00C-B74926AB7B4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9B74CE1C-2916-4DA2-B00C-B74926AB7B4C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9071D3FD-3F6C-478C-B307-45F5FEF41296}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9071D3FD-3F6C-478C-B307-45F5FEF41296}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9071D3FD-3F6C-478C-B307-45F5FEF41296}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9071D3FD-3F6C-478C-B307-45F5FEF41296}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
