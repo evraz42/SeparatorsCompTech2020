@@ -25,19 +25,34 @@ namespace VideoHandler
                 {
                     capture.Capture.GrabFrame();
                     var frameImageData = capture.Capture.RetrieveFrame();
-                    if (frameImageData != null)
+                    if (frameImageData == null)
                     {
-                        var length = frameImageData.Height * frameImageData.Width;
-                        var imageDataBytes = new byte[length];
-                        Marshal.Copy(frameImageData.ImageData, imageDataBytes, 0, length);
-                        new WebServiceConnector(imageDataBytes).Send();
-
+                        return;
                     }
+                    
+                    var length = frameImageData.Height * frameImageData.Width;
+                    var imageDataBytes = new byte[length];
+                    Marshal.Copy(frameImageData.ImageData, imageDataBytes, 0, length);
+
+                    var imageBytes = GetTwoDimensionalArray<byte>(imageDataBytes, frameImageData.Width, frameImageData.Height);
+                    new WebServiceConnector(imageBytes).Send();
 
                     Cv.WaitKey(1000);
                 }
             }
         }
-        
+
+        private T[,] GetTwoDimensionalArray<T>(T[] array, int width, int height)
+        {
+            var resultArray = new T[height, width];
+            for (var i = 0; i < height; i++)
+            {
+                for (var j = 0; j < width; j++)
+                {
+                    resultArray[i, j] = array[i * width + j];
+                }
+            }
+            return resultArray;
+        }
     }
 }

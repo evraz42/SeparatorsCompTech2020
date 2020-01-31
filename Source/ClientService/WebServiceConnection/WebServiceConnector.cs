@@ -12,10 +12,10 @@ namespace ClientService
     public class WebServiceConnector
     {
         [NotNull] private static readonly HttpClient _client = new HttpClient();
-        [NotNull] private readonly byte[] _picture;
+        [NotNull] private readonly byte[,] _picture;
         [NotNull] private readonly Uri _uri = new Uri("http://localhost:51460/prediction");
 
-        public WebServiceConnector([NotNull] byte[] data)
+        public WebServiceConnector([NotNull] byte[,] data)
         {
             _picture = data;
 
