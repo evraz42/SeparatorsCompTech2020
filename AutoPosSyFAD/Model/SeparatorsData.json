@@ -1,0 +1,39 @@
+[
+    {
+        "id": 1 {
+            "date": "01/30/20",
+            "type": "left",
+            "position": 4,
+            "currentProbability": 97.94,
+            "otherProbability": 1.22,
+            "img": "logo"
+        },
+        {
+            "date": "01/29/20",
+            "type": "right",
+            "position": 2,
+            "currentProbability": 92.04,
+            "otherProbability": 3.47,
+            "img": "logo"
+        }
+    },
+    {
+        "id": 2 {
+            "date": "01/29/20",
+            "type": "right",
+            "position": 2,
+            "currentProbability": 92.04,
+            "otherProbability": 3.47,
+            "img": "logo"
+        },
+        {
+            "date": "01/30/20",
+            "type": "left",
+            "position": 4,
+            "currentProbability": 97.94,
+            "otherProbability": 1.22,
+            "img": "logo"
+        }
+        
+    }
+]

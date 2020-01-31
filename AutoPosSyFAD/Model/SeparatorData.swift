@@ -9,10 +9,9 @@
 import Foundation
 
 struct SeparatorData {
-    var date: String
-    var type: String
-    var position: Int
-    var currentProbability: Double
-    var otherProbability: Double
-    var img: String
+    let date: String
+    let type: Int
+    let position: Int
+    let currentProbability: Double
+    let img: String
 }

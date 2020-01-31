@@ -12,11 +12,14 @@ class AppStyle {
     
     func customizationSegmentController(_ positionsController: [UIButton], _ positionsView: UIView) {
         for btn in positionsController {
-            btn.layer.cornerRadius = 10
-            btn.clipsToBounds = true
+            customizationButton(btn)
         }
         positionsView.layer.cornerRadius = 10
         positionsView.clipsToBounds = true
     }
     
+    func customizationButton(_ btn: UIButton) {
+        btn.layer.cornerRadius = 10
+        btn.clipsToBounds = true
+    }
 }

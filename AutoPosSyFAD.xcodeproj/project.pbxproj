@@ -7,10 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		020D4BD923E33E2800CFC494 /* SeparatorsPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 020D4BD823E33E2800CFC494 /* SeparatorsPage.swift */; };
+		0248DB9323E26F97000D5556 /* SeparatorsData.json in Resources */ = {isa = PBXBuildFile; fileRef = 0248DB9223E26F97000D5556 /* SeparatorsData.json */; };
+		0248DB9523E2803E000D5556 /* PresentDataPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0248DB9423E2803E000D5556 /* PresentDataPage.swift */; };
 		0270A0A023E097F000C43CC7 /* SettingsMenuPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0270A09F23E097F000C43CC7 /* SettingsMenuPage.swift */; };
 		0273913623E1B9AC002F06BF /* SeparatorData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0273913523E1B9AC002F06BF /* SeparatorData.swift */; };
 		0273913A23E1BF23002F06BF /* AppStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0273913923E1BF23002F06BF /* AppStyle.swift */; };
-		027B280623E135A900128B39 /* MainPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 027B280523E135A900128B39 /* MainPage.swift */; };
+		027B280623E135A900128B39 /* SeparatorDataPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 027B280523E135A900128B39 /* SeparatorDataPage.swift */; };
 		02AEC52723E03E3A00EC96A5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02AEC52623E03E3A00EC96A5 /* AppDelegate.swift */; };
 		02AEC52923E03E3A00EC96A5 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02AEC52823E03E3A00EC96A5 /* SceneDelegate.swift */; };
 		02AEC52E23E03E3A00EC96A5 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 02AEC52C23E03E3A00EC96A5 /* Main.storyboard */; };
@@ -18,15 +21,20 @@
 		02AEC53323E03E3E00EC96A5 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 02AEC53123E03E3E00EC96A5 /* LaunchScreen.storyboard */; };
 		02B5468123E16B4E00FD37DC /* DataProcessing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02B5468023E16B4E00FD37DC /* DataProcessing.swift */; };
 		02B5468323E16ECB00FD37DC /* Separator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02B5468223E16ECB00FD37DC /* Separator.swift */; };
-		02DEC6E723E17FE2006B17C1 /* CustomTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02DEC6E623E17FE2006B17C1 /* CustomTableViewCell.swift */; };
+		02D5415223E3DCB500E87FDA /* ModelHolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02D5415123E3DCB500E87FDA /* ModelHolder.swift */; };
+		02D5415423E3DF6800E87FDA /* RequestParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02D5415323E3DF6800E87FDA /* RequestParameters.swift */; };
+		02DEC6E723E17FE2006B17C1 /* CustomCells.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02DEC6E623E17FE2006B17C1 /* CustomCells.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		020D4BD823E33E2800CFC494 /* SeparatorsPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeparatorsPage.swift; sourceTree = "<group>"; };
+		0248DB9223E26F97000D5556 /* SeparatorsData.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = SeparatorsData.json; sourceTree = "<group>"; };
+		0248DB9423E2803E000D5556 /* PresentDataPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresentDataPage.swift; sourceTree = "<group>"; };
 		0270A09F23E097F000C43CC7 /* SettingsMenuPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsMenuPage.swift; sourceTree = "<group>"; };
 		0273913523E1B9AC002F06BF /* SeparatorData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeparatorData.swift; sourceTree = "<group>"; };
 		0273913923E1BF23002F06BF /* AppStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStyle.swift; sourceTree = "<group>"; };
-		027B280523E135A900128B39 /* MainPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainPage.swift; sourceTree = "<group>"; };
-		02AEC52323E03E3A00EC96A5 /* AutoPosSyFAD.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AutoPosSyFAD.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		027B280523E135A900128B39 /* SeparatorDataPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeparatorDataPage.swift; sourceTree = "<group>"; };
+		02AEC52323E03E3A00EC96A5 /* Позиционирование флажков сепаратора.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Позиционирование флажков сепаратора.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		02AEC52623E03E3A00EC96A5 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		02AEC52823E03E3A00EC96A5 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		02AEC52D23E03E3A00EC96A5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -35,7 +43,9 @@
 		02AEC53423E03E3E00EC96A5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		02B5468023E16B4E00FD37DC /* DataProcessing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataProcessing.swift; sourceTree = "<group>"; };
 		02B5468223E16ECB00FD37DC /* Separator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Separator.swift; sourceTree = "<group>"; };
-		02DEC6E623E17FE2006B17C1 /* CustomTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTableViewCell.swift; sourceTree = "<group>"; };
+		02D5415123E3DCB500E87FDA /* ModelHolder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelHolder.swift; sourceTree = "<group>"; };
+		02D5415323E3DF6800E87FDA /* RequestParameters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestParameters.swift; sourceTree = "<group>"; };
+		02DEC6E623E17FE2006B17C1 /* CustomCells.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomCells.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,6 +63,7 @@
 			isa = PBXGroup;
 			children = (
 				0273913923E1BF23002F06BF /* AppStyle.swift */,
+				02DEC6E623E17FE2006B17C1 /* CustomCells.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -68,7 +79,7 @@
 		02AEC52423E03E3A00EC96A5 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				02AEC52323E03E3A00EC96A5 /* AutoPosSyFAD.app */,
+				02AEC52323E03E3A00EC96A5 /* Позиционирование флажков сепаратора.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -78,6 +89,7 @@
 			children = (
 				02AEC53C23E03E5500EC96A5 /* Delegate */,
 				0273913B23E1BF29002F06BF /* Helpers */,
+				02D5415023E3DC9600E87FDA /* Singletone */,
 				02AEC53A23E03E4400EC96A5 /* Model */,
 				02AEC53B23E03E4A00EC96A5 /* ViewController */,
 				02AEC53D23E03E6400EC96A5 /* Storyboard */,
@@ -92,8 +104,9 @@
 			children = (
 				02B5468223E16ECB00FD37DC /* Separator.swift */,
 				0273913523E1B9AC002F06BF /* SeparatorData.swift */,
-				02DEC6E623E17FE2006B17C1 /* CustomTableViewCell.swift */,
 				02B5468023E16B4E00FD37DC /* DataProcessing.swift */,
+				0248DB9223E26F97000D5556 /* SeparatorsData.json */,
+				02D5415323E3DF6800E87FDA /* RequestParameters.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -101,7 +114,9 @@
 		02AEC53B23E03E4A00EC96A5 /* ViewController */ = {
 			isa = PBXGroup;
 			children = (
-				027B280523E135A900128B39 /* MainPage.swift */,
+				020D4BD823E33E2800CFC494 /* SeparatorsPage.swift */,
+				027B280523E135A900128B39 /* SeparatorDataPage.swift */,
+				0248DB9423E2803E000D5556 /* PresentDataPage.swift */,
 				0270A09F23E097F000C43CC7 /* SettingsMenuPage.swift */,
 			);
 			path = ViewController;
@@ -125,6 +140,14 @@
 			path = Storyboard;
 			sourceTree = "<group>";
 		};
+		02D5415023E3DC9600E87FDA /* Singletone */ = {
+			isa = PBXGroup;
+			children = (
+				02D5415123E3DCB500E87FDA /* ModelHolder.swift */,
+			);
+			path = Singletone;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -142,7 +165,7 @@
 			);
 			name = AutoPosSyFAD;
 			productName = AutoPosSyFAD;
-			productReference = 02AEC52323E03E3A00EC96A5 /* AutoPosSyFAD.app */;
+			productReference = 02AEC52323E03E3A00EC96A5 /* Позиционирование флажков сепаратора.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -184,6 +207,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				02AEC53323E03E3E00EC96A5 /* LaunchScreen.storyboard in Resources */,
+				0248DB9323E26F97000D5556 /* SeparatorsData.json in Resources */,
 				02AEC53023E03E3E00EC96A5 /* Assets.xcassets in Resources */,
 				02AEC52E23E03E3A00EC96A5 /* Main.storyboard in Resources */,
 			);
@@ -199,11 +223,15 @@
 				02AEC52723E03E3A00EC96A5 /* AppDelegate.swift in Sources */,
 				02B5468123E16B4E00FD37DC /* DataProcessing.swift in Sources */,
 				0270A0A023E097F000C43CC7 /* SettingsMenuPage.swift in Sources */,
+				02D5415423E3DF6800E87FDA /* RequestParameters.swift in Sources */,
+				02D5415223E3DCB500E87FDA /* ModelHolder.swift in Sources */,
 				02B5468323E16ECB00FD37DC /* Separator.swift in Sources */,
 				0273913623E1B9AC002F06BF /* SeparatorData.swift in Sources */,
-				027B280623E135A900128B39 /* MainPage.swift in Sources */,
+				0248DB9523E2803E000D5556 /* PresentDataPage.swift in Sources */,
+				027B280623E135A900128B39 /* SeparatorDataPage.swift in Sources */,
 				0273913A23E1BF23002F06BF /* AppStyle.swift in Sources */,
-				02DEC6E723E17FE2006B17C1 /* CustomTableViewCell.swift in Sources */,
+				02DEC6E723E17FE2006B17C1 /* CustomCells.swift in Sources */,
+				020D4BD923E33E2800CFC494 /* SeparatorsPage.swift in Sources */,
 				02AEC52923E03E3A00EC96A5 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -356,7 +384,7 @@
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = my.AutoPosSyFAD;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "Позиционирование флажков сепаратора";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -374,7 +402,7 @@
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = my.AutoPosSyFAD;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "Позиционирование флажков сепаратора";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
