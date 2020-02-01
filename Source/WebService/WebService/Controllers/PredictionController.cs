@@ -11,7 +11,7 @@ namespace WebService.Controllers
     public class PredictionController : ApiController
     {
         // POST: api/Prediction
-        public string Post([FromBody]byte[] data)
+        public string Post([FromBody]byte[][] data)
         {
             if(data == null)
             {
