@@ -136,7 +136,7 @@ func main() {
 
 				err = poller.Start(desc, func(ev netpoll.Event) {
 					if ev&(netpoll.EventErr|netpoll.EventPollerClosed|netpoll.EventReadHup) != 0 {
-						log.Error("netpool event error")
+						log.Error("netpoll event error")
 						err = poller.Stop(desc)
 						if err != nil {
 							log.Error(err)

@@ -213,7 +213,6 @@ func (ch *Channel) CheckReqLimit() bool {
 		ch.reqPerSecond = 0
 	}
 	ch.reqPerSecond++
-	log.Info(ch.reqPerMinute)
 	if ch.reqPerSecond > 5 {
 		ch.ban = true
 		return true

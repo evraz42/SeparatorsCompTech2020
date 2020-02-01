@@ -1,3 +1,9 @@
+create schema public;
+
+comment on schema public is 'standard public schema';
+
+alter schema public owner to postgres;
+
 create table devices
 (
 	id_device uuid not null
@@ -36,12 +42,6 @@ create index flags_positions_index
 create index flags_time_index
 	on flags (time);
 
-create trigger products_notify_event
-	after insert
-	on flags
-	for each row
-	execute procedure notify_flags_event();
-
 create table logs
 (
 	id bigserial not null
@@ -59,4 +59,25 @@ create unique index logs_id_uindex
 
 create index logs_time_index
 	on logs (time);
+
+create function notify_flags_event() returns trigger
+	language plpgsql
+as $$
+BEGIN
+    -- Execute pg_notify(channel, notification)
+    PERFORM pg_notify('flags', row_to_json(NEW)::text);
+
+    -- Result is ignored since this is an AFTER trigger
+    RETURN NULL;
+END;
+
+$$;
+
+alter function notify_flags_event() owner to evraz;
+
+create trigger products_notify_event
+	after insert
+	on flags
+	for each row
+	execute procedure notify_flags_event();
 
