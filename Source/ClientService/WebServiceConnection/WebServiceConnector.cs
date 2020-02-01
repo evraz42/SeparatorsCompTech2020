@@ -25,13 +25,11 @@ namespace ClientService
 
         public async Task Send()
         {
-            Separator separator;
-
             try
             {
                 using var response = await GetResponse();
                 response.EnsureSuccessStatusCode();
-                separator = await GetResponseObject(response);
+                GetResponseObject(response);
             }
             catch (HttpRequestException e)
             {
@@ -54,13 +52,13 @@ namespace ClientService
         }
 
         [NotNull]
-        private async Task<Separator> GetResponseObject([NotNull]HttpResponseMessage response)
+        private async /*Task<ISeparator>*/ void GetResponseObject([NotNull]HttpResponseMessage response)
         {
             var responseBody = await response.Content.ReadAsStringAsync();
 
-            var separator = Validator.Validate(JsonConvert.DeserializeObject(responseBody));
-            separator.Picture = _picture;
-            return separator;
+            //var separator = Validator.Validate(JsonConvert.DeserializeObject(responseBody));
+            //separator.Picture = _picture;
+            return ;
         }
     }
 }

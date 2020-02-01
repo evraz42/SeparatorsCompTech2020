@@ -24,7 +24,14 @@ namespace DatabaseController
 
         private void CompareWithLast()
         {
-
+            using (var context = new DatabaseContext())
+            {
+                var separators = context.Separators;
+                foreach (var separator in separators)
+                {
+                    Console.WriteLine("{0}.{1} - {2}", u.Id, u.Name, u.Age);
+                }
+            }
         }
     }
 }
