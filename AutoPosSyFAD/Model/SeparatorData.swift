@@ -12,6 +12,6 @@ struct SeparatorData {
     let date: String
     let type: Int
     let position: Int
-    let currentProbability: Double
+    let currentProbability: Int
     let img: String
 }

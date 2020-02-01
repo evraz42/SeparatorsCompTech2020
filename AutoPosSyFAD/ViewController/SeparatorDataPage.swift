@@ -60,7 +60,17 @@ class SeparatorDataPage: UIViewController, UITableViewDataSource, UITableViewDel
 
         let separatorData = separator?.data
         //fill custom cell
-        cell.cellImg.image = UIImage(named: separatorData?[indexPath.row].img ?? "logo")
+        ImageProcessing().fetchImage(from: (separatorData?[indexPath.row].img)!) { (imageData) in
+            if let data = imageData {
+                DispatchQueue.main.async {
+                    cell.cellImg.image = UIImage(data: data)
+                }
+            } else {
+                cell.cellImg.image = UIImage(named: "logo")
+                print("Error loading image");
+            }
+        }
+        
         cell.date.text = separatorData?[indexPath.row].date
         switch separatorData?[indexPath.row].type {
             case 0:
@@ -71,6 +81,7 @@ class SeparatorDataPage: UIViewController, UITableViewDataSource, UITableViewDel
                 cell.type.text = "Нет данных"
         }
         cell.position.text = separatorData?[indexPath.row].position != nil ? "\(separatorData![indexPath.row].position)" : "Нет данных"
+        cell.probability.text = separatorData?[indexPath.row].currentProbability != nil ? "\(separatorData![indexPath.row].currentProbability)%" : "Нет данных"
         
         return cell
     }

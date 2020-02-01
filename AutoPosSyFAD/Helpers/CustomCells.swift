@@ -15,6 +15,7 @@ class MainPageTableViewCell: UITableViewCell {
     @IBOutlet weak var date: UILabel!
     @IBOutlet weak var type: UILabel!
     @IBOutlet weak var position: UILabel!
+    @IBOutlet weak var probability: UILabel!
     
 }
 

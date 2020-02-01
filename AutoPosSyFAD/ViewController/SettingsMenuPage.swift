@@ -22,8 +22,9 @@ class SettingsMenuPage: UITableViewController {
     @IBOutlet var currentPosSliders: [UISlider]!
     @IBOutlet var currentPosLabels: [UILabel]!
     
-    private let dataProc = ModelsHolder.instance.dataProcessing
-    var currentDateButton: UIButton?
+    private let webSocketData = ModelsHolder.instance.webSocketData
+    private let sliderStep: Float = 10
+    private var currentDateButton: UIButton?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -32,13 +33,94 @@ class SettingsMenuPage: UITableViewController {
         //set titles color
         UISegmentedControl.appearance().setTitleTextAttributes([NSAttributedString.Key.foregroundColor: UIColor.white], for: .selected)
         //set custom style for items
-        AppStyle().customizationButton(chooseDateButton)
+        for btn in dateButtons { AppStyle().activeCustomButton(btn) }
+        AppStyle().unactiveCustomButton(chooseDateButton)
         AppStyle().customizationSegmentController(positionButtons, positionButtonsView)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         //send request to DB
+        let minDate = stringToDate(dateButtons[0].titleLabel!.text!)
+        let maxDate = stringToDate(dateButtons[1].titleLabel!.text!)
+        let startTime = Int(minDate.timeIntervalSince1970)
+        let endTime = Int(maxDate.timeIntervalSince1970)
+        let flagType = flagsController.selectedSegmentIndex
+        var flagPositions: [Int]?
+        for btn in positionButtons {
+            if btn.tag == 0 { continue }
+            if flagPositions != nil {
+                flagPositions?.append(Int(btn.titleLabel!.text!)!)
+            }
+            else {
+                flagPositions = [Int(btn.titleLabel!.text!)!]
+            }
+        }
+        let minCurProbability = Int(currentPosSliders[0].value)
+        let maxCurProbability = Int(currentPosSliders[1].value)
+        
+        let requestParam = RequestParameters(minDate: startTime,
+                                             maxDate: endTime,
+                                             flagType: flagType,
+                                             flagPositions: flagPositions!,
+                                             minCurProbability: minCurProbability,
+                                             maxCurProbability: maxCurProbability)
+        webSocketData.historicalRequest(requestParam)
+    }
+    
+    
+    @IBAction func dateButtonTapped(_ sender: Any) {
+        currentDateButton = sender as? UIButton
+        
+        chooseDateButton.isEnabled = true
+        AppStyle().activeCustomButton(chooseDateButton)
+        
+        for btn in dateButtons {
+            btn.isEnabled = false
+            AppStyle().unactiveCustomButton(btn)
+        }
+        
+        datePicker.isEnabled = true
+    }
+    //make sure the dates are coorect
+    @IBAction func chooseDateButtonTapped(_ sender: Any) { //This is not SOLID ;c
+        var confirmDate = false
+        //take current data from date picker and format them
+        let currentDate = dateToString(datePicker!.date)
+        
+        confirmDate = compareDate(currentDate)
+        
+        if !confirmDate { return }
+        //else we change date and data
+        for btn in dateButtons {
+            btn.isEnabled = true
+            if currentDateButton == btn {
+                btn.setTitle(currentDate, for: .normal)
+            }
+            AppStyle().activeCustomButton(btn)
+        }
+        
+        datePicker.isEnabled = false
+        
+        chooseDateButton.isEnabled = false
+        AppStyle().unactiveCustomButton(chooseDateButton)
+        
+    }
+    
+    func compareDate (_ currentDate: String) -> Bool {
+        let currentDate = dateToString(datePicker!.date)
+        
+        switch currentDateButton!.tag {
+        case 0:
+            if stringToDate(currentDate) > stringToDate(dateButtons[1].titleLabel!.text!) { break } //compare
+            return true
+        case 1:
+            if stringToDate(currentDate) < stringToDate(dateButtons[0].titleLabel!.text!) { break } //compare
+            return true
+        default:
+            break
+        }
+        return false
     }
     
     @IBAction func positionButtonTapped(_ sender: Any) {
@@ -65,7 +147,7 @@ class SettingsMenuPage: UITableViewController {
             button.tag = 0
         }
         else {
-            button.backgroundColor = .systemIndigo
+            button.backgroundColor = AppStyle().customColor
             button.tag = 1
         }
         
@@ -87,72 +169,26 @@ class SettingsMenuPage: UITableViewController {
                     break
             }
         }
+        let roundedStepValue = round(currentSlider.value / sliderStep) * sliderStep
+        currentSlider.value = roundedStepValue
         let currentValue = Int(currentSlider.value)
         currentPosLabels[currentSlider.tag].text = String(currentValue) + "%"
         
     }
     
-    @IBAction func dateButtonTapped(_ sender: Any) {
-        currentDateButton = sender as? UIButton
-        
-        chooseDateButton.isEnabled = true
-        chooseDateButton.backgroundColor = .systemIndigo
-        
-        for btn in dateButtons {
-            btn.isEnabled = false
-            btn.setTitleColor(.secondarySystemFill, for: .normal)
-        }
-        
-        datePicker.isEnabled = true
-    }
-    //make sure the dates are coorect
-    @IBAction func chooseDateButtonTapped(_ sender: Any) { //This is not SOLID ;c
-        
-        var confirmDate = false
-        //take current data from date picker and format them
+    func stringToDate(_ textDate: String) -> Date {
         let formatter = DateFormatter()
-        formatter.dateFormat = "MM/dd/yyyy"
+        formatter.dateFormat = "MM/dd/yyyy HH:mm"
         formatter.timeZone = .none
-        let currentDate = formatter.string(from: datePicker!.date)
-        
-        confirmDate = compareDate(currentDate)
-        
-        if !confirmDate { return }
-        //else we change date and data
-        for btn in dateButtons {
-            btn.isEnabled = true
-            if currentDateButton == btn {
-                btn.setTitle(currentDate, for: .normal)
-            }
-            btn.setTitleColor(.systemIndigo, for: .normal)
-        }
-        
-        datePicker.isEnabled = false
-        
-        chooseDateButton.isEnabled = false
-        chooseDateButton.backgroundColor = .secondarySystemFill
-        
+        return formatter.date(from: textDate)!
     }
     
-    func compareDate (_ currentDate: String) -> Bool {
+    func dateToString(_ date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "MM/dd/yyyy"
+        formatter.dateFormat = "MM/dd/yyyy HH:mm"
         formatter.timeZone = .none
-        let currentDate = formatter.string(from: datePicker!.date)
-        
-        switch currentDateButton!.tag {
-        case 0:
-            if formatter.date(from: currentDate)! > formatter.date(from: dateButtons[1].titleLabel!.text!)! { break } //compare
-            return true
-        case 1:
-            if formatter.date(from: currentDate)! < formatter.date(from: dateButtons[0].titleLabel!.text!)! { break } //compare
-            return true
-        default:
-            break
-        }
-        return false
+        return formatter.string(from: date)
     }
-    
 }
 
 extension String {

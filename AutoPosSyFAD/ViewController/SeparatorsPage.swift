@@ -15,27 +15,29 @@ class SeparatorsPage: UIViewController, UITableViewDelegate, UITableViewDataSour
     
     private let cellReuseIdentifier = "SeparatorDataCell"
     
-    var dataProc: DataProcessing?
+    private var webSocketData: WebSocketDataWorking?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         separatorsTableView.delegate = self
         separatorsTableView.dataSource = self
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
-        if (dataProc == nil) {
+        if (webSocketData == nil) {
             activityIndicator.startAnimating()
 
             separatorsTableView.separatorStyle = .none
 
             OperationQueue.main.addOperation() {
                 Thread.sleep(forTimeInterval: 2)
-                self.dataProc = ModelsHolder.instance.dataProcessing
-                self.dataProc?.getDataFromDatabase()
+                self.webSocketData = ModelsHolder.instance.webSocketData
+                self.webSocketData?.initConnection()
+                self.webSocketData?.responseData() //Delet after testing connection
 
                 self.activityIndicator.stopAnimating()
 
@@ -46,13 +48,13 @@ class SeparatorsPage: UIViewController, UITableViewDelegate, UITableViewDataSour
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return dataProc?.separatorsData.count ?? 0
+        return webSocketData?.separatorsData.count ?? 0
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: SeparatorDataCell = self.separatorsTableView.dequeueReusableCell(withIdentifier: cellReuseIdentifier) as! SeparatorDataCell
         
-        let separatorsData = dataProc?.separatorsData
+        let separatorsData = webSocketData?.separatorsData
         cell.cellData.text = separatorsData?[indexPath.row].name
         
         return cell
@@ -63,7 +65,7 @@ class SeparatorsPage: UIViewController, UITableViewDelegate, UITableViewDataSour
             if let indexPath = self.separatorsTableView.indexPathForSelectedRow {
                 let controller = segue.destination as! SeparatorDataPage
                 OperationQueue.main.addOperation {
-                    controller.separator = self.dataProc?.separatorsData[indexPath.row]
+                    controller.separator = self.webSocketData?.separatorsData[indexPath.row]
                 }
             }
         }

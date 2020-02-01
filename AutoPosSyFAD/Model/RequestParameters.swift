@@ -9,11 +9,10 @@
 import Foundation
 
 struct RequestParameters {
-    //let firstDate: String
-    //let lastDate: String
+    let minDate: Int
+    let maxDate: Int
     let flagType: Int
     let flagPositions: [Int]
-    let minCurProbability: Float
-    let maxCurProbability: Float
-    //probably i will add other probability's
+    let minCurProbability: Int
+    let maxCurProbability: Int
 }

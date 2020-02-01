@@ -10,6 +10,7 @@ import UIKit
 
 class PresentDataPage: UIViewController, UITableViewDataSource, UITableViewDelegate {
 
+    @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var dataTableView: UITableView!
     private let cellReuseIdentifier = "DataCell"
     private var currentSection = 0
@@ -22,6 +23,17 @@ class PresentDataPage: UIViewController, UITableViewDataSource, UITableViewDeleg
         
         dataTableView.delegate = self
         dataTableView.dataSource = self
+        
+        ImageProcessing().fetchImage(from: (separatorData?.img)!) { (imageData) in
+            if let data = imageData {
+                DispatchQueue.main.async {
+                    self.imageView.image = UIImage(data: data)
+                }
+            } else {
+                self.imageView.image = UIImage(named: "logo")
+                print("Error loading image");
+            }
+        }
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
@@ -60,9 +72,9 @@ class PresentDataPage: UIViewController, UITableViewDataSource, UITableViewDeleg
                 data = "Правый"
             }
         case 2:
-            data = String(separator.position)
+            data = "\(separator.position)"
         case 3:
-            data = String(separator.currentProbability)
+            data = "\(separator.currentProbability)%"
         default:
             break
         }

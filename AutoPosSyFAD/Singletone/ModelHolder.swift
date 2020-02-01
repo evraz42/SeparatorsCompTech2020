@@ -11,5 +11,5 @@ import Foundation
 struct ModelsHolder {
     static let instance = ModelsHolder()
     
-    var dataProcessing = DataProcessing()
+    let webSocketData = WebSocketDataWorking()
 }
