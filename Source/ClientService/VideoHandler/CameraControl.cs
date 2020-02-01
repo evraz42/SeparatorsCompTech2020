@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using ClientService;
+using WebServiceConnection;
 using JetBrains.Annotations;
 using OpenCvSharp;
 
@@ -34,7 +34,7 @@ namespace VideoHandler
                     var imageDataBytes = new byte[length];
                     Marshal.Copy(frameImageData.ImageData, imageDataBytes, 0, length);
 
-                    var imageBytes = GetTwoDimensionalArray<byte>(imageDataBytes, frameImageData.Width, frameImageData.Height);
+                    var imageBytes = GetTwoDimensionalArray(imageDataBytes, frameImageData.Width, frameImageData.Height);
                     new WebServiceConnector(imageBytes).Send();
 
                     Cv.WaitKey(1000);
@@ -42,7 +42,8 @@ namespace VideoHandler
             }
         }
 
-        private T[,] GetTwoDimensionalArray<T>(T[] array, int width, int height)
+        [NotNull]
+        private static T[,] GetTwoDimensionalArray<T>([NotNull] T[] array, int width, int height)
         {
             var resultArray = new T[height, width];
             for (var i = 0; i < height; i++)
