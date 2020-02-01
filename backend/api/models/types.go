@@ -52,10 +52,12 @@ type HistoricalRequest struct {
 
 type DataFields struct {
 	IDDevice
-	Time      Time      `json:"time"`
-	TypeFlag  int       `json:"type_flag"`
-	Positions []float64 `json:"position"`
-	ImagePath string    `json:"image_path"`
+	Time               Time      `json:"time"`
+	TypeFlag           int       `json:"type_flag"`
+	Positions          []float64 `json:"positions"`
+	CurrentPosition    int       `json:"current_position"`
+	CurrentProbability float64   `json:"current_probability"`
+	ImagePath          string    `json:"image_path"`
 }
 
 type HistoricalResponse struct {
@@ -63,6 +65,7 @@ type HistoricalResponse struct {
 }
 
 type DataMessageResponse struct {
+	Type string `json:"type"`
 	DataFields
 }
 

@@ -57,12 +57,16 @@ func (c *Connector) UnSubscribe(channel string, send chan interface{}) {
 }
 
 func (c *Connector) Run() {
+	msg := DataMessageResponse{
+		Type: "data_message",
+	}
 	for {
 		select {
 		case dataMsg := <-c.receiveData:
+			msg.DataFields = dataMsg
 			c.mutex.RLock()
 			for i := range c.subscribers[dataMsg.IDDevice.IDDevice] {
-				c.subscribers[dataMsg.IDDevice.IDDevice][i] <- dataMsg
+				c.subscribers[dataMsg.IDDevice.IDDevice][i] <- msg
 			}
 			c.mutex.RUnlock()
 		}
