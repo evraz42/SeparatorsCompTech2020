@@ -1,12 +1,12 @@
-﻿using System.Collections.Generic;
-using VideoHandler;
-
-class Program
+﻿
+namespace VideoHandler
 {
-    static void Main()
+    class Program
     {
-        var cameraCaptures = new List<CameraCapture>(){ new CameraCapture(0) };
-        var cameraControl = new CameraControl(cameraCaptures);
-        cameraControl.Run();
+        static void Main(string[] args)
+        {
+            var cameraControl = new CameraControl("C:/Users/kindl/Downloads/asds.avi");
+            cameraControl.Run();
+        }
     }
 }

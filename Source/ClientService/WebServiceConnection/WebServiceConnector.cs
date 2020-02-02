@@ -7,16 +7,17 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using DatabaseController.DataTypesInterfaces;
+using Moq;
 
 namespace WebServiceConnection
 {
     public class WebServiceConnector
     {
         [NotNull] private static readonly HttpClient Client = new HttpClient();
-        [NotNull] private readonly byte[,] _picture;
+        [NotNull] private readonly byte[] _picture;
         [NotNull] private readonly Uri _uri = new Uri("http://localhost:51460/prediction");
 
-        public WebServiceConnector([NotNull] byte[,] data)
+        public WebServiceConnector([NotNull] byte[] data)
         {
             _picture = data;
 
@@ -24,7 +25,7 @@ namespace WebServiceConnection
             Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
-        public async Task Send()
+        public async void Send()
         {
             IDevice device = null;
             try
@@ -37,6 +38,8 @@ namespace WebServiceConnection
             {
 
             }
+
+            //var deviceMock = new Mock<IDevice>();
 
             new DatabaseSaver(device, _picture).Save();
 
