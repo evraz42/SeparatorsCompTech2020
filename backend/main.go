@@ -102,7 +102,9 @@ func main() {
 
 	// Create netpool --------------------------------------------------------------------------------------------------
 
-	poller, err := netpoll.New(nil)
+	poller, err := netpoll.New(&netpoll.Config{OnWaitError: func(e error) {
+		log.Error(err)
+	}})
 	if err != nil {
 		log.Warn(err)
 		log.Exit(3)
