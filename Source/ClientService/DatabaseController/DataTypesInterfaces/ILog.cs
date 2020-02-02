@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DataTypes
+namespace DatabaseController.DataTypesInterfaces
 {
-    public class IFlag
+    public interface ILog
     {
     }
 }

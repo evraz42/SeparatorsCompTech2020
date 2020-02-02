@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using DatabaseController.DataTypesInterfaces;
 
 namespace WebServiceConnection
 {
@@ -25,18 +26,19 @@ namespace WebServiceConnection
 
         public async Task Send()
         {
+            IDevice device = null;
             try
             {
                 using var response = await GetResponse();
                 response.EnsureSuccessStatusCode();
-                GetResponseObject(response);
+                device = await GetResponseObject(response);
             }
             catch (HttpRequestException e)
             {
 
             }
 
-            new DatabaseSaver(new Device(), _picture).Save();
+            new DatabaseSaver(device, _picture).Save();
 
         }
 
@@ -52,13 +54,12 @@ namespace WebServiceConnection
         }
 
         [NotNull]
-        private async /*Task<ISeparator>*/ void GetResponseObject([NotNull]HttpResponseMessage response)
+        private async Task<IDevice> GetResponseObject([NotNull]HttpResponseMessage response)
         {
             var responseBody = await response.Content.ReadAsStringAsync();
 
             //var separator = Validator.Validate(JsonConvert.DeserializeObject(responseBody));
-            //separator.Picture = _picture;
-            return ;
+            return null;
         }
     }
 }

@@ -1,14 +1,15 @@
 ﻿using System.IO;
 using System.Linq;
+using DatabaseController.DataTypesInterfaces;
 
 namespace DatabaseController
 {
     public sealed class DatabaseSaver
     {
-        private readonly Device _savedDevice;
+        private readonly IDevice _savedDevice;
         private readonly byte[,] _picture;
 
-        public DatabaseSaver(Device savedObject, byte[,] picture)
+        public DatabaseSaver(IDevice savedObject, byte[,] picture)
         {
             _savedDevice = savedObject;
             _picture = picture;
@@ -16,7 +17,8 @@ namespace DatabaseController
 
         public void Save()
         {
-            if(!CompareWithLast())
+            SavePicture();
+            if (!CompareWithLast())
             {
                 return;
             }
@@ -34,7 +36,7 @@ namespace DatabaseController
             {
                 var savedPath = "";
                 flag.image_path = savedPath;
-                File.WriteAllBytes(savedPath, GetOneDimensionalArray<byte>(_picture));
+                File.WriteAllBytes(savedPath, GetOneDimensionalArray(_picture));
             }
         }
 

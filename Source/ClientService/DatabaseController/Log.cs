@@ -1,11 +1,12 @@
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using DatabaseController.DataTypesInterfaces;
+
 namespace DatabaseController
 {
-    using System;
-    using System.ComponentModel.DataAnnotations;
-    using System.ComponentModel.DataAnnotations.Schema;
-
     [Table("public.logs")]
-    public partial class Log
+    public partial class Log : ILog
     {
         public long id { get; set; }
 

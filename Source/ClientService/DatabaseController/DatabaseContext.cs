@@ -1,10 +1,8 @@
+using DatabaseController.DataTypesInterfaces;
+using System.Data.Entity;
+
 namespace DatabaseController
 {
-    using System;
-    using System.Data.Entity;
-    using System.ComponentModel.DataAnnotations.Schema;
-    using System.Linq;
-
     public partial class DatabaseContext : DbContext
     {
         public DatabaseContext()
@@ -12,9 +10,9 @@ namespace DatabaseController
         {
         }
 
-        public virtual DbSet<Device> Devices { get; set; }
-        public virtual DbSet<Flag> Flags { get; set; }
-        public virtual DbSet<Log> Logs { get; set; }
+        public virtual DbSet<IDevice> Devices { get; set; }
+        public virtual DbSet<IFlag> Flags { get; set; }
+        public virtual DbSet<ILog> Logs { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
