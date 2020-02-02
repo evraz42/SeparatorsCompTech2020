@@ -76,3 +76,8 @@ func (c *Connector) Run() {
 func (c *Connector) GetChannel() chan<- FlagFields {
 	return c.receiveData
 }
+
+func (c *Connector) CheckSubscribe(channel string, send chan<- interface{}) bool {
+	_, ok := c.subscribersIndex[channel][send]
+	return ok
+}

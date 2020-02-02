@@ -64,7 +64,9 @@ func (ch *Channel) Receive() {
 	if err != nil {
 		var errorResp *models.ErrorResponse
 		if errors.As(err, &errorResp) {
-			log.Error(errorResp.Err)
+			if errorResp.Err != nil {
+				log.Error(err)
+			}
 			ch.SendErrorResponse(errorResp.Nonce, errorResp.Message, errorResp.Code)
 		} else {
 			log.Error(err)
@@ -162,6 +164,9 @@ func (ch *Channel) handlerPacket(pkt []byte) error {
 		err = json.Unmarshal(pkt, &subMsg)
 		if err != nil {
 			return &models.ErrorResponse{Message: "Invalid request", Code: http.StatusBadRequest, Err: err}
+		}
+		if ch.connector.CheckSubscribe(subMsg.IDDevice.IDDevice, ch.send) {
+			return &models.ErrorResponse{Message: "You are already subscribed to this device", Code: http.StatusOK}
 		}
 		ch.connector.Subscribe(subMsg.IDDevice.IDDevice, ch.send)
 		ch.SendResponse(models.RequestTypeInfo, requestHeader.Nonce, models.InfoResponse{Status: "Successful subscribe"})

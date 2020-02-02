@@ -135,8 +135,7 @@ func main() {
 				}
 
 				err = poller.Start(desc, func(ev netpoll.Event) {
-					if ev&(netpoll.EventErr|netpoll.EventPollerClosed|netpoll.EventReadHup) != 0 {
-						log.Error("netpoll event error")
+					if ev&netpoll.EventReadHup != 0 {
 						err = poller.Stop(desc)
 						if err != nil {
 							log.Error(err)
@@ -148,8 +147,10 @@ func main() {
 						return
 					}
 
-					ch.CheckReqLimit()
-					ch.Receive()
+					pool.Schedule(func() {
+						ch.CheckReqLimit()
+						ch.Receive()
+					})
 				})
 				if err != nil {
 					log.Error(err)

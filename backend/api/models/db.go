@@ -45,7 +45,7 @@ func (db *DB) GetHistoricalData(filters *Filters, sort *SortFlags, limit int, of
 			query = query.Where("type_flag = $1", filters.TypeFlag)
 		}
 		if filters.Positions != nil {
-			query = query.Where("current_position = ANY($1)", filters.Positions)
+			query = query.Where("current_position = ANY($1)", pq.Array(filters.Positions))
 		}
 		if filters.ProbabilityCurrentMax != nil {
 			query = query.Where("current_probability <= $1", filters.ProbabilityCurrentMax)

@@ -41,7 +41,7 @@ type Filters struct {
 	StartTime             *int64   `json:"start_time"`
 	EndTime               *int64   `json:"end_time"`
 	TypeFlag              *int     `json:"type_flag"`
-	Positions             *[]int   `json:"positions"`
+	Positions             *[]int64 `json:"positions"`
 	ProbabilityCurrentMin *float64 `json:"probability_current_min"`
 	ProbabilityCurrentMax *float64 `json:"probability_current_max"`
 }
