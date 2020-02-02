@@ -15,14 +15,14 @@ func ConnectListener(config string) *pq.Listener {
 	})
 }
 
-func RunListener(listener *pq.Listener, channel string, receiveChan chan<- DataFields) error {
+func RunListener(listener *pq.Listener, channel string, receiveChan chan<- FlagFields) error {
 	err := listener.Listen(channel)
 	if err != nil {
 		return err
 	}
 
-	dataMessage := DataFields{}
-	zeroDataMessage := DataFields{}
+	dataMessage := FlagFields{}
+	zeroDataMessage := FlagFields{}
 
 	for {
 		select {

@@ -47,9 +47,26 @@ func (ch *Channel) Close() error {
 }
 
 func (ch *Channel) Receive() {
-	if ch.noReaderYet {
-		ch.noReaderYet = false
-		ch.pool.Schedule(ch.reader)
+	reader := wsutil.NewServerSideReader(ch.conn)
+
+	pkt, err := ch.readPacket(reader)
+	if err != nil {
+		log.Error(err)
+		if err == io.EOF {
+			err = ch.conn.Close()
+			if err != nil {
+				log.Error(err)
+			}
+			return
+		}
+	}
+	err = ch.handlerPacket(pkt)
+	if err != nil {
+		log.Error(err)
+		var errorResp *models.ErrorResponse
+		if errors.As(err, &errorResp) {
+			ch.SendErrorResponse(errorResp.Nonce, errorResp.Message, errorResp.Code)
+		}
 	}
 }
 
@@ -76,32 +93,6 @@ func (ch *Channel) SendErrorResponse(nonce int64, message string, code int) {
 		Message: message,
 		Code:    code,
 	})
-}
-
-func (ch *Channel) reader() {
-	reader := wsutil.NewServerSideReader(ch.conn)
-
-	for {
-		pkt, err := ch.readPacket(reader)
-		if err != nil {
-			log.Error(err)
-			if err == io.EOF {
-				err = ch.conn.Close()
-				if err != nil {
-					log.Error(err)
-				}
-				return
-			}
-		}
-		err = ch.handlerPacket(pkt)
-		if err != nil {
-			log.Error(err)
-			var errorResp *models.ErrorResponse
-			if errors.As(err, &errorResp) {
-				ch.SendErrorResponse(errorResp.Nonce, errorResp.Message, errorResp.Code)
-			}
-		}
-	}
 }
 
 func (ch *Channel) writer() {
@@ -159,7 +150,8 @@ func (ch *Channel) handlerPacket(pkt []byte) error {
 		devicesListResp := models.DevicesListResponse{}
 		devicesListResp.Devices, err = ch.db.GetDevices()
 		if err != nil {
-			return &models.ErrorResponse{Message: "Internal error", Code: http.StatusInternalServerError, Nonce: requestHeader.Nonce}
+			return &models.ErrorResponse{Message: "Internal error", Code: http.StatusInternalServerError,
+				Nonce: requestHeader.Nonce, Err: err}
 		}
 		ch.SendResponse(requestHeader.Type, requestHeader.Nonce, devicesListResp)
 
@@ -187,6 +179,12 @@ func (ch *Channel) handlerPacket(pkt []byte) error {
 		if err != nil {
 			return &models.ErrorResponse{Message: "Invalid request", Code: http.StatusBadRequest}
 		}
+		flags, err := ch.db.GetHistoricalData(histMsg.Filters, histMsg.Sort, histMsg.Limit, histMsg.Offset)
+		if err != nil {
+			return &models.ErrorResponse{Message: "Internal error", Code: http.StatusInternalServerError,
+				Nonce: requestHeader.Nonce, Err: err}
+		}
+		ch.SendResponse("historical", requestHeader.Nonce, models.HistoricalResponse{Flags: flags})
 
 	default:
 		return &models.ErrorResponse{Message: "Unknown method type ", Code: http.StatusBadRequest, Nonce: requestHeader.Nonce}

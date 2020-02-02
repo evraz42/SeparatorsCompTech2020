@@ -5,7 +5,7 @@ import (
 )
 
 type Connector struct {
-	receiveData chan DataFields
+	receiveData chan FlagFields
 	mutex       sync.RWMutex
 	subscribers map[string][]chan<- interface{}
 
@@ -17,7 +17,7 @@ func NewConnector() *Connector {
 		mutex:            sync.RWMutex{},
 		subscribers:      make(map[string][]chan<- interface{}),
 		subscribersIndex: make(map[string]map[chan<- interface{}]int),
-		receiveData:      make(chan DataFields, 128),
+		receiveData:      make(chan FlagFields, 128),
 	}
 }
 
@@ -63,7 +63,7 @@ func (c *Connector) Run() {
 	for {
 		select {
 		case dataMsg := <-c.receiveData:
-			msg.DataFields = dataMsg
+			msg.FlagFields = dataMsg
 			c.mutex.RLock()
 			for i := range c.subscribers[dataMsg.IDDevice.IDDevice] {
 				c.subscribers[dataMsg.IDDevice.IDDevice][i] <- msg
@@ -73,6 +73,6 @@ func (c *Connector) Run() {
 	}
 }
 
-func (c *Connector) GetChannel() chan<- DataFields {
+func (c *Connector) GetChannel() chan<- FlagFields {
 	return c.receiveData
 }
