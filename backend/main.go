@@ -12,6 +12,7 @@ import (
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"net"
+	"net/http"
 	"time"
 )
 
@@ -148,7 +149,17 @@ func main() {
 					}
 
 					pool.Schedule(func() {
-						ch.CheckReqLimit()
+						if ch.CheckReqLimit() {
+							ch.SendErrorResponse(0, "Too many request, ban", http.StatusTooManyRequests)
+							err = poller.Stop(desc)
+							if err != nil {
+								log.Error(err)
+							}
+							err = ch.Close()
+							if err != nil {
+								log.Error(err)
+							}
+						}
 						ch.Receive()
 					})
 				})

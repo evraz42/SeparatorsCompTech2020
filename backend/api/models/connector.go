@@ -9,15 +9,17 @@ type Connector struct {
 	mutex       sync.RWMutex
 	subscribers map[string][]chan<- interface{}
 
-	subscribersIndex map[string]map[chan<- interface{}]int
+	subscribersIndex   map[string]map[chan<- interface{}]int
+	reverseSubscribers map[chan<- interface{}][]string
 }
 
 func NewConnector() *Connector {
 	return &Connector{
-		mutex:            sync.RWMutex{},
-		subscribers:      make(map[string][]chan<- interface{}),
-		subscribersIndex: make(map[string]map[chan<- interface{}]int),
-		receiveData:      make(chan FlagFields, 128),
+		mutex:              sync.RWMutex{},
+		subscribers:        make(map[string][]chan<- interface{}),
+		subscribersIndex:   make(map[string]map[chan<- interface{}]int),
+		reverseSubscribers: make(map[chan<- interface{}][]string),
+		receiveData:        make(chan FlagFields),
 	}
 }
 
@@ -34,9 +36,10 @@ func (c *Connector) Subscribe(channel string, send chan<- interface{}) {
 
 	c.subscribers[channel] = append(c.subscribers[channel], send)
 	c.subscribersIndex[channel][send] = len(c.subscribers) - 1
+	c.reverseSubscribers[send] = append(c.reverseSubscribers[send], channel)
 }
 
-func (c *Connector) UnSubscribe(channel string, send chan interface{}) {
+func (c *Connector) UnSubscribe(channel string, send chan<- interface{}) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
@@ -54,6 +57,12 @@ func (c *Connector) UnSubscribe(channel string, send chan interface{}) {
 
 	c.subscribers[channel][index] = c.subscribers[channel][len(c.subscribers[channel])-1]
 	c.subscribers[channel] = c.subscribers[channel][:len(c.subscribers[channel])-1]
+}
+
+func (c *Connector) UnSubscribeAll(send chan<- interface{}) {
+	for _, channel := range c.reverseSubscribers[send] {
+		c.UnSubscribe(channel, send)
+	}
 }
 
 func (c *Connector) Run() {

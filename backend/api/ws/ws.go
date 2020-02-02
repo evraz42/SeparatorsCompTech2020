@@ -18,8 +18,8 @@ import (
 type Channel struct {
 	conn         net.Conn
 	send         chan interface{}
+	close        chan struct{}
 	noWriterYet  bool
-	noReaderYet  bool
 	pool         *gpool.Pool
 	connector    *models.Connector
 	reqPerMinute [60]int
@@ -32,9 +32,9 @@ type Channel struct {
 func NewChannel(conn net.Conn, pool *gpool.Pool, connector *models.Connector, db models.Database) *Channel {
 	c := &Channel{
 		conn:        conn,
-		send:        make(chan interface{}, 128),
+		send:        make(chan interface{}),
+		close:       make(chan struct{}),
 		noWriterYet: true,
-		noReaderYet: true,
 		pool:        pool,
 		connector:   connector,
 		db:          db,
@@ -43,6 +43,8 @@ func NewChannel(conn net.Conn, pool *gpool.Pool, connector *models.Connector, db
 }
 
 func (ch *Channel) Close() error {
+	ch.connector.UnSubscribeAll(ch.send)
+	ch.close <- struct{}{}
 	return ch.conn.Close()
 }
 
@@ -103,10 +105,15 @@ func (ch *Channel) writer() {
 	writer := wsutil.NewWriter(ch.conn, ws.StateServerSide, ws.OpText)
 	encoder := json.NewEncoder(writer)
 
-	for pkt := range ch.send {
-		err := writePacket(writer, encoder, pkt)
-		if err != nil {
-			log.Error(err)
+	for {
+		select {
+		case pkt := <-ch.send:
+			err := writePacket(writer, encoder, pkt)
+			if err != nil {
+				log.Error(err)
+				return
+			}
+		case <-ch.close:
 			return
 		}
 	}
