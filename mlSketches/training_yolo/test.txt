@@ -1,0 +1,7 @@
+./JPEGs/source2_076.jpg
+./JPEGs/source2_005.jpg
+./JPEGs/source2_054.jpg
+./JPEGs/source2_013.jpg
+./JPEGs/source2_018.jpg
+./JPEGs/source2_041.jpg
+./JPEGs/source2_051.jpg
