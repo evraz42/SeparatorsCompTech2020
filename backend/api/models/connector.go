@@ -58,11 +58,21 @@ func (c *Connector) UnSubscribe(channel string, send chan<- interface{}) {
 	c.subscribers[channel][index] = c.subscribers[channel][len(c.subscribers[channel])-1]
 	c.subscribers[channel] = c.subscribers[channel][:len(c.subscribers[channel])-1]
 
+	if len(c.subscribers[channel]) != 0 {
+		c.subscribersIndex[channel][c.subscribers[channel][index]] = index
+	}
+	delete(c.subscribersIndex[channel], send)
+
 	for i := range c.reverseSubscribers[send] {
 		if c.reverseSubscribers[send][i] == channel {
 			c.reverseSubscribers[send][i] = c.reverseSubscribers[send][len(c.reverseSubscribers[send])-1]
 			c.reverseSubscribers[send] = c.reverseSubscribers[send][:len(c.reverseSubscribers[send])-1]
+			break
 		}
+	}
+
+	if len(c.reverseSubscribers[send]) == 0 {
+		delete(c.reverseSubscribers, send)
 	}
 }
 
@@ -94,6 +104,8 @@ func (c *Connector) GetChannel() chan<- FlagFields {
 }
 
 func (c *Connector) CheckSubscribe(channel string, send chan<- interface{}) bool {
+	c.mutex.RLock()
+	defer c.mutex.RUnlock()
 	_, ok := c.subscribersIndex[channel][send]
 	return ok
 }

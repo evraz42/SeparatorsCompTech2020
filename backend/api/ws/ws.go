@@ -184,6 +184,9 @@ func (ch *Channel) handlerPacket(pkt []byte) error {
 		if err != nil {
 			return &models.ErrorResponse{Message: "Invalid request", Code: http.StatusBadRequest, Err: err}
 		}
+		if !ch.connector.CheckSubscribe(unSubMsg.IDDevice.IDDevice, ch.send) {
+			return &models.ErrorResponse{Message: "You are not subscribed to this device", Code: http.StatusOK}
+		}
 		ch.connector.UnSubscribe(unSubMsg.IDDevice.IDDevice, ch.send)
 		ch.SendResponse(models.RequestTypeInfo, requestHeader.Nonce, models.InfoResponse{Status: "Successful unsubscribe"})
 
