@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using DatabaseController;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
 using System;
 using System.Net.Http;
@@ -35,7 +36,7 @@ namespace WebServiceConnection
 
             }
 
-            //new DatabaseController(separator).Save();
+            new DatabaseSaver(new Device(), _picture).Save();
 
         }
 

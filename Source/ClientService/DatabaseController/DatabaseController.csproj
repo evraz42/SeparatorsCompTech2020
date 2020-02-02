@@ -95,9 +95,9 @@
   <ItemGroup>
     <Compile Include="DatabaseController.cs" />
     <Compile Include="DatabaseContext.cs" />
-    <Compile Include="Devices.cs" />
-    <Compile Include="Flags.cs" />
-    <Compile Include="Logs.cs" />
+    <Compile Include="Device.cs" />
+    <Compile Include="Flag.cs" />
+    <Compile Include="Log.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

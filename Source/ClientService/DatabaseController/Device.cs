@@ -4,15 +4,14 @@ namespace DatabaseController
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
-    using System.Data.Entity.Spatial;
 
     [Table("public.devices")]
-    public partial class Devices
+    public partial class Device
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public Devices()
+        public Device()
         {
-            flags = new HashSet<Flags>();
+            flags = new HashSet<Flag>();
         }
 
         [Key]
@@ -24,6 +23,6 @@ namespace DatabaseController
         public int number_device { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Flags> flags { get; set; }
+        public virtual ICollection<Flag> flags { get; set; }
     }
 }

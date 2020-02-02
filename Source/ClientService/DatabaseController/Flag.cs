@@ -1,13 +1,11 @@
 namespace DatabaseController
 {
     using System;
-    using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
-    using System.Data.Entity.Spatial;
 
     [Table("public.flags")]
-    public partial class Flags
+    public partial class Flag
     {
         public int id { get; set; }
 
@@ -24,6 +22,6 @@ namespace DatabaseController
 
         public float current_probability { get; set; }
 
-        public virtual Devices devices { get; set; }
+        public virtual Device devices { get; set; }
     }
 }
