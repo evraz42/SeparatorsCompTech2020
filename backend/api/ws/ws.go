@@ -62,10 +62,12 @@ func (ch *Channel) Receive() {
 	}
 	err = ch.handlerPacket(pkt)
 	if err != nil {
-		log.Error(err)
 		var errorResp *models.ErrorResponse
 		if errors.As(err, &errorResp) {
+			log.Error(errorResp.Err)
 			ch.SendErrorResponse(errorResp.Nonce, errorResp.Message, errorResp.Code)
+		} else {
+			log.Error(err)
 		}
 	}
 }
