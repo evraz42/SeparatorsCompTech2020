@@ -57,6 +57,13 @@ func (c *Connector) UnSubscribe(channel string, send chan<- interface{}) {
 
 	c.subscribers[channel][index] = c.subscribers[channel][len(c.subscribers[channel])-1]
 	c.subscribers[channel] = c.subscribers[channel][:len(c.subscribers[channel])-1]
+
+	for i := range c.reverseSubscribers[send] {
+		if c.reverseSubscribers[send][i] == channel {
+			c.reverseSubscribers[send][i] = c.reverseSubscribers[send][len(c.reverseSubscribers[send])-1]
+			c.reverseSubscribers[send] = c.reverseSubscribers[send][:len(c.reverseSubscribers[send])-1]
+		}
+	}
 }
 
 func (c *Connector) UnSubscribeAll(send chan<- interface{}) {
