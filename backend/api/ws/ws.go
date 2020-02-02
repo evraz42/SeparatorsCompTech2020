@@ -144,7 +144,7 @@ func (ch *Channel) handlerPacket(pkt []byte) error {
 	requestHeader := models.RequestHeader{}
 	err := json.Unmarshal(pkt, &requestHeader)
 	if err != nil {
-		return &models.ErrorResponse{Message: "Invalid request", Code: http.StatusBadRequest}
+		return &models.ErrorResponse{Message: "Invalid request", Code: http.StatusBadRequest, Err: err}
 	}
 
 	switch requestHeader.Type {
@@ -161,7 +161,7 @@ func (ch *Channel) handlerPacket(pkt []byte) error {
 		subMsg := models.SubscribeMessage{}
 		err = json.Unmarshal(pkt, &subMsg)
 		if err != nil {
-			return &models.ErrorResponse{Message: "Invalid request", Code: http.StatusBadRequest}
+			return &models.ErrorResponse{Message: "Invalid request", Code: http.StatusBadRequest, Err: err}
 		}
 		ch.connector.Subscribe(subMsg.IDDevice.IDDevice, ch.send)
 		ch.SendResponse(models.RequestTypeInfo, requestHeader.Nonce, models.InfoResponse{Status: "Successful subscribe"})
@@ -170,7 +170,7 @@ func (ch *Channel) handlerPacket(pkt []byte) error {
 		unSubMsg := models.UnSubscribeMessage{}
 		err = json.Unmarshal(pkt, &unSubMsg)
 		if err != nil {
-			return &models.ErrorResponse{Message: "Invalid request", Code: http.StatusBadRequest}
+			return &models.ErrorResponse{Message: "Invalid request", Code: http.StatusBadRequest, Err: err}
 		}
 		ch.connector.UnSubscribe(unSubMsg.IDDevice.IDDevice, ch.send)
 		ch.SendResponse(models.RequestTypeInfo, requestHeader.Nonce, models.InfoResponse{Status: "Successful unsubscribe"})
@@ -179,7 +179,7 @@ func (ch *Channel) handlerPacket(pkt []byte) error {
 		histMsg := models.HistoricalRequest{}
 		err = json.Unmarshal(pkt, &histMsg)
 		if err != nil {
-			return &models.ErrorResponse{Message: "Invalid request", Code: http.StatusBadRequest}
+			return &models.ErrorResponse{Message: "Invalid request", Code: http.StatusBadRequest, Err: err}
 		}
 		flags, err := ch.db.GetHistoricalData(histMsg.Filters, histMsg.Sort, histMsg.Limit, histMsg.Offset)
 		if err != nil {
