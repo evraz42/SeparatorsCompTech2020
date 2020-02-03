@@ -1,6 +1,7 @@
 package models
 
 import (
+	log "github.com/sirupsen/logrus"
 	"sync"
 )
 
@@ -24,6 +25,11 @@ func NewConnector() *Connector {
 }
 
 func (c *Connector) Subscribe(channel string, send chan<- interface{}) {
+	defer func() {
+		if r := recover(); r != nil {
+			log.Error(r)
+		}
+	}()
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
@@ -40,6 +46,11 @@ func (c *Connector) Subscribe(channel string, send chan<- interface{}) {
 }
 
 func (c *Connector) UnSubscribe(channel string, send chan<- interface{}) {
+	defer func() {
+		if r := recover(); r != nil {
+			log.Error(r)
+		}
+	}()
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 

@@ -160,6 +160,7 @@ func (ch *Channel) readPacket(reader *wsutil.Reader) ([]byte, error) {
 }
 
 func (ch *Channel) handlerPacket(pkt []byte) error {
+	log.Info("Receive packet: ", string(pkt))
 	requestHeader := models.RequestHeader{}
 	err := json.Unmarshal(pkt, &requestHeader)
 	if err != nil {
