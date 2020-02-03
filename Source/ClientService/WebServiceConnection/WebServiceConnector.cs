@@ -34,12 +34,13 @@ namespace WebServiceConnection
                 device = await GetResponseObject(response);
                 if(device == null)
                 {
+                    //logging
                     return;
                 }
             }
             catch (HttpRequestException e)
             {
-
+                //logging
             }
 
             //var deviceMock = new Mock<IDevice>();

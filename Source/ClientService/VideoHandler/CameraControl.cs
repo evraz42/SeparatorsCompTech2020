@@ -28,6 +28,12 @@ namespace VideoHandler
             while (true)
             {
                 var image = _capture.QueryFrame();
+                if(image == null)
+                {
+                    //logging
+                    continue;
+                }
+
                 using var stream = new MemoryStream();
                 image.Bitmap?.Save(stream, ImageFormat.Jpeg);
                 new WebServiceConnector(stream.ToArray()).Send();
