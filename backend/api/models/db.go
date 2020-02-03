@@ -79,7 +79,7 @@ func (db *DB) GetHistoricalData(filters *Filters, sort *SortFlags, limit int, of
 		}
 	}
 
-	var flags []FlagFields
+	flags := make([]FlagFields, 0)
 
 	rows, err := query.
 		Limit(limit).
