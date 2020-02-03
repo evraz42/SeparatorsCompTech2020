@@ -93,9 +93,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DatabaseController\DatabaseController.csproj">
-      <Project>{33FC05CB-E8B9-4B5E-B3CA-8591A79745E7}</Project>
-      <Name>DatabaseController</Name>
+    <ProjectReference Include="..\Guard\Guard.csproj">
+      <Project>{96BB2F01-5469-4785-A0A7-DDB12956C9E9}</Project>
+      <Name>Guard</Name>
     </ProjectReference>
     <ProjectReference Include="..\WebServiceConnection\WebServiceConnection.csproj">
       <Project>{8e754f1d-6755-4222-8a82-af4d2bc6c227}</Project>

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using JetBrains.Annotations;
 
-namespace DataControllerCore
+namespace DatabaseControllerCore
 {
     [Table("public.devices")]
     public partial class Device
@@ -13,12 +15,18 @@ namespace DataControllerCore
         }
 
         public Guid IdDevice { get; set; }
+
+        [Required]
+        [Column("name_device")]
         public string NameDevice { get; set; }
+
+        [Column("number_device")]
         public int NumberDevice { get; set; }
 
         public virtual ICollection<Flag> Flags { get; set; }
 
         [NotMapped]
+        [NotNull]
         public int[] FlagsPosition { get; set; }
 
         public bool IsValid()

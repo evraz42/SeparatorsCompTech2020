@@ -1,6 +1,6 @@
-﻿using DataControllerCore;
+﻿using DatabaseControllerCore;
+using Guard;
 using JetBrains.Annotations;
-using Moq;
 using Newtonsoft.Json;
 using System;
 using System.Net.Http;
@@ -27,48 +27,23 @@ namespace WebServiceConnection
         public async void Send()
         {
             Device device = null;
-            //try
-            //{
-            //    using var response = await GetResponse();
-            //    response.EnsureSuccessStatusCode();
-                //device = await GetResponseObject(response);
-                //if(device == null)
-                //{
-                //    //logging
-                //    return;
-                //}
-            //}
-            //catch (HttpRequestException e)
-            //{
-            //    //logging
-            //}
-
-            device = new Device
+            try
             {
-                NameDevice = "separator",
-                NumberDevice = 1,
-                IdDevice = Guid.NewGuid()
-            };
-            device.Flags.Add(
-                new Flag
-                {
-                    TypeFlag = 0,
-                    CurrentPosition = 1,
-                    CurrentProbability = (float)0.95,
-                    Positions = new float[] { 1, 2, 3, 4, 5, 6, 7 },
-                    IdDeviceNavigation = (Device)device
-                });
-            
-            device.Flags.Add(
-                new Flag
-                {
-                    TypeFlag = 1,
-                    CurrentPosition = 1,
-                    CurrentProbability = (float)0.95,
-                    Positions = new float[] { 1, 2, 3, 4, 5, 6, 7 },
-                    IdDeviceNavigation = (Device)device
-                });
+                using var response = await GetResponse();
+                response.EnsureSuccessStatusCode();
+                device = await GetResponseObject(response);
+                
+            }
+            catch (HttpRequestException e)
+            {
+                //logging
+            }
 
+            if (device == null)
+            {
+                //logging
+                return;
+            }
             new DatabaseSaver(device, _picture).Save();
 
         }
@@ -88,6 +63,7 @@ namespace WebServiceConnection
         private async Task<Device> GetResponseObject([NotNull]HttpResponseMessage response)
         {
             var responseBody = await response.Content.ReadAsStringAsync();
+
             var obj = JsonConvert.DeserializeObject(responseBody);
             if (!(obj is Device deviceObj))
             {

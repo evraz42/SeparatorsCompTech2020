@@ -1,16 +1,18 @@
 ﻿using System;
 using System.IO;
+using JetBrains.Annotations;
 
 namespace VideoHandler
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        static void Main([NotNull][ItemNotNull] string[] args)
         {
             if(args.Length < 1 || args.Length > 2)
             {
-                Console.WriteLine("Usage: [ProgramName].exe <File/camera path> [period (sec)]");
+                Console.WriteLine("Usage: <ProgramName>.exe <File/camera path> [period (sec)]");
             }
+
             var filePath = args[0];
             if (!File.Exists(filePath))
             {

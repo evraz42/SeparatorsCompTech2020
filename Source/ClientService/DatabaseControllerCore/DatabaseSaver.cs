@@ -1,19 +1,21 @@
-﻿using System;
+﻿using JetBrains.Annotations;
+using System;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using Guard;
 
-namespace DataControllerCore
+namespace DatabaseControllerCore
 {
     public sealed class DatabaseSaver
     {
-        private readonly Device _savedDevice;
-        private readonly byte[] _picture;
+        [NotNull] private readonly Device _savedDevice;
+        [NotNull] private readonly byte[] _imageBytes;
 
-        public DatabaseSaver(Device savedObject, byte[] picture)
+        public DatabaseSaver([NotNull] Device savedObject, [NotNull] byte[] imageBytes)
         {
             _savedDevice = savedObject;
-            _picture = picture;
+            _imageBytes = imageBytes;
         }
 
         public void Save()
@@ -31,33 +33,40 @@ namespace DataControllerCore
 
             using var context = new DatabaseContext();
             context.Devices.Add(_savedDevice);
-
-            
             context.SaveChanges();
         }
 
         private void SaveFlagInfo()
         {
-            using var stream = new MemoryStream(_picture);
+            using var stream = new MemoryStream(_imageBytes);
             var image = Image.FromStream(stream);
 
-            //ImageProcessor.DrawRectangle(
-            //    image,
-            //    _savedDevice.FlagsPosition[0],
-            //    _savedDevice.FlagsPosition[1],
-            //    _savedDevice.FlagsPosition[2],
-            //    _savedDevice.FlagsPosition[3]);
+            if (_savedDevice.FlagsPosition.Length != 4)
+            {
+                return;
+            }
+            ImageProcessor.DrawRectangle(
+                image,
+                _savedDevice.FlagsPosition[0],
+                _savedDevice.FlagsPosition[1],
+                _savedDevice.FlagsPosition[2],
+                _savedDevice.FlagsPosition[3]);
 
             foreach (var flag in _savedDevice.Flags)
             {
-                var savedPath = "C:/Users/User/Downloads/a/" 
-                    + _savedDevice.NameDevice + "_"
-                    + _savedDevice.NumberDevice +"_"
-                    +flag.TypeFlag +".jpg";
-
-                flag.ImagePath = savedPath;
                 flag.Time = DateTime.Now;
                 flag.IdDevice = _savedDevice.IdDevice;
+
+                var savedPath = "C:/Users/User/Downloads/a/" 
+                    + _savedDevice.NameDevice
+                    + _savedDevice.NumberDevice +"_"
+                    + flag.TypeFlag + "_"
+                    + flag.Time.ToShortDateString() + "_"
+                    + flag.Time.Hour + "."
+                    + flag.Time.Minute + "."
+                    + flag.Time.Second + ".jpg";
+
+                flag.ImagePath = savedPath;
                 image.Save(savedPath);
             }
         }
@@ -76,11 +85,7 @@ namespace DataControllerCore
                 return false;
             }
 
-            if (lastDevice.Equals(_savedDevice))
-            {
-                return true;
-            }
-            return false;
+            return lastDevice.Equals(_savedDevice);
         }
     }
 }
