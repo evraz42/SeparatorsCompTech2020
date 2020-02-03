@@ -1,19 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
+﻿using Newtonsoft.Json;
+using System.Drawing;
+using System.IO;
 using System.Web.Http;
-using Newtonsoft.Json;
 
 namespace WebService.Controllers
 {
     public class PredictionController : ApiController
     {
         // POST: api/Prediction
-        public string Post([FromBody]byte[][] data)
+        public string Post([FromBody]byte[] data)
         {
             if(data == null)
+            {
+                return null;
+            }
+
+            using var stream = new MemoryStream(data);
+            var image = Image.FromStream(stream);
+            if(image == null)
             {
                 return null;
             }

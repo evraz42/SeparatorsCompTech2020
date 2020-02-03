@@ -17,34 +17,22 @@ namespace VideoHandler
             _capture = new Capture(filename);
         }
 
-        public CameraControl(string filename, int msDelay)
+        public CameraControl(string filename, int sDelay)
         {
             _capture = new Capture(filename);
-            _msDelay = msDelay;
+            _msDelay = sDelay * 1000;
         }
 
         public void Run()
         {
-            var image = _capture.QueryFrame();
-            using var stream = new MemoryStream();
-            image.Bitmap?.Save(stream, ImageFormat.Jpeg);
-            new WebServiceConnector(stream.ToArray()).Send();
-            Thread.Sleep(_msDelay);
+            while (true)
+            {
+                var image = _capture.QueryFrame();
+                using var stream = new MemoryStream();
+                image.Bitmap?.Save(stream, ImageFormat.Jpeg);
+                new WebServiceConnector(stream.ToArray()).Send();
+                Thread.Sleep(_msDelay);
+            }
         }
     }
-    
-    //    [NotNull]
-    //    private static T[,] GetTwoDimensionalArray<T>([NotNull] T[] array, int width, int height)
-    //    {
-    //        var resultArray = new T[height, width];
-    //        for (var i = 0; i < height; i++)
-    //        {
-    //            for (var j = 0; j < width; j++)
-    //            {
-    //                resultArray[i, j] = array[i * width + j];
-    //            }
-    //        }
-    //        return resultArray;
-    //    }
-    //}
 }
