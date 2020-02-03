@@ -36,14 +36,13 @@ func (c *Connector) Subscribe(channel string, send chan<- interface{}) {
 	}
 
 	c.subscribers[channel] = append(c.subscribers[channel], send)
-	c.subscribersIndex[channel][send] = len(c.subscribers) - 1
+	c.subscribersIndex[channel][send] = len(c.subscribers[channel]) - 1
 	c.reverseSubscribers[send] = append(c.reverseSubscribers[send], channel)
 }
 
 func (c *Connector) UnSubscribe(channel string, send chan<- interface{}) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
-	log.Info(c.subscribers, c.subscribersIndex, c.reverseSubscribers)
 
 	if _, ok := c.subscribers[channel]; !ok {
 		return
@@ -60,7 +59,7 @@ func (c *Connector) UnSubscribe(channel string, send chan<- interface{}) {
 	c.subscribers[channel][index] = c.subscribers[channel][len(c.subscribers[channel])-1]
 	c.subscribers[channel] = c.subscribers[channel][:len(c.subscribers[channel])-1]
 
-	if len(c.subscribers[channel]) != 0 {
+	if len(c.subscribers[channel]) != 0 && len(c.subscribers[channel]) != index {
 		c.subscribersIndex[channel][c.subscribers[channel][index]] = index
 	}
 	delete(c.subscribersIndex[channel], send)
@@ -76,7 +75,6 @@ func (c *Connector) UnSubscribe(channel string, send chan<- interface{}) {
 	if len(c.reverseSubscribers[send]) == 0 {
 		delete(c.reverseSubscribers, send)
 	}
-	log.Info(c.subscribers, c.subscribersIndex, c.reverseSubscribers)
 }
 
 func (c *Connector) UnSubscribeAll(send chan<- interface{}) {
