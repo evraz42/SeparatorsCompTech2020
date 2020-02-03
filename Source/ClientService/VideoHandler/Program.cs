@@ -17,7 +17,7 @@ namespace VideoHandler
             }
 
             CameraControl cameraControl;
-            if (int.TryParse(args[1], out var secDelay)
+            if (int.TryParse(args[1], out var secDelay))
             {
                 cameraControl = new CameraControl("C:/Users/kindl/Downloads/asds.avi", secDelay);
             }
