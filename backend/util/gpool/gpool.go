@@ -2,6 +2,7 @@ package gpool
 
 import (
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 	"time"
 )
 
@@ -37,6 +38,11 @@ func (p *Pool) schedule(task func(), timeout <-chan time.Time) error {
 }
 
 func (p *Pool) worker(task func()) {
+	defer func() {
+		if r := recover(); r != nil {
+			log.Error(r)
+		}
+	}()
 	defer func() { <-p.sem }()
 	for {
 		task()

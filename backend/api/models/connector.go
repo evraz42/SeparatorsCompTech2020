@@ -25,11 +25,6 @@ func NewConnector() *Connector {
 }
 
 func (c *Connector) Subscribe(channel string, send chan<- interface{}) {
-	defer func() {
-		if r := recover(); r != nil {
-			log.Error(r)
-		}
-	}()
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
@@ -46,13 +41,9 @@ func (c *Connector) Subscribe(channel string, send chan<- interface{}) {
 }
 
 func (c *Connector) UnSubscribe(channel string, send chan<- interface{}) {
-	defer func() {
-		if r := recover(); r != nil {
-			log.Error(r)
-		}
-	}()
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
+	log.Info(c.subscribers, c.subscribersIndex, c.reverseSubscribers)
 
 	if _, ok := c.subscribers[channel]; !ok {
 		return
@@ -85,16 +76,24 @@ func (c *Connector) UnSubscribe(channel string, send chan<- interface{}) {
 	if len(c.reverseSubscribers[send]) == 0 {
 		delete(c.reverseSubscribers, send)
 	}
+	log.Info(c.subscribers, c.subscribersIndex, c.reverseSubscribers)
 }
 
 func (c *Connector) UnSubscribeAll(send chan<- interface{}) {
+	c.mutex.RLock()
 	channels := c.reverseSubscribers[send]
+	c.mutex.RUnlock()
 	for _, channel := range channels {
 		c.UnSubscribe(channel, send)
 	}
 }
 
 func (c *Connector) Run() {
+	defer func() {
+		if r := recover(); r != nil {
+			log.Error(r)
+		}
+	}()
 	msg := DataMessageResponse{
 		Type: "data_message",
 	}
