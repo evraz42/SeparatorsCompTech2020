@@ -88,7 +88,8 @@ func (c *Connector) UnSubscribe(channel string, send chan<- interface{}) {
 }
 
 func (c *Connector) UnSubscribeAll(send chan<- interface{}) {
-	for _, channel := range c.reverseSubscribers[send] {
+	channels := c.reverseSubscribers[send]
+	for _, channel := range channels {
 		c.UnSubscribe(channel, send)
 	}
 }
