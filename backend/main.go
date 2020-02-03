@@ -139,7 +139,7 @@ func main() {
 
 				err = poller.Start(desc, func(ev netpoll.Event) {
 					if ev&netpoll.EventReadHup != 0 {
-
+						log.Info("Close conn")
 						err = poller.Stop(desc)
 						if err != nil {
 							log.Error(err)

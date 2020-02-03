@@ -45,8 +45,6 @@ func NewChannel(conn net.Conn, pool *gpool.Pool, connector *models.Connector, db
 func (ch *Channel) Close() error {
 	ch.connector.UnSubscribeAll(ch.send)
 	ch.close <- struct{}{}
-	close(ch.send)
-	close(ch.close)
 	return ch.conn.Close()
 }
 
@@ -126,6 +124,8 @@ func (ch *Channel) writer() {
 				return
 			}
 		case <-ch.close:
+			close(ch.send)
+			close(ch.close)
 			return
 		}
 	}
