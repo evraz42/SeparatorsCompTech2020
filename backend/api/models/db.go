@@ -9,7 +9,7 @@ import (
 
 type Database interface {
 	GetHistoricalData(filters *Filters, sort *SortFlags, limit int, offset int) (*[]FlagFields, error)
-	GetDevices() ([]Devices, error)
+	GetDevices() (Devices, error)
 }
 
 type DB struct {

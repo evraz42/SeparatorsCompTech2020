@@ -10,7 +10,7 @@ type Monitoring struct {
 	WsConnections prometheus.Gauge
 }
 
-func (m *Monitoring) Run() error {
+func (m *Monitoring) Run(address string) error {
 	m.WsConnections = prometheus.NewGauge(
 		prometheus.GaugeOpts{
 			Name: "ws_connections",
@@ -22,7 +22,7 @@ func (m *Monitoring) Run() error {
 
 	http.Handle("/metrics", promhttp.Handler())
 
-	if err := http.ListenAndServe(":2112", nil); err != nil {
+	if err := http.ListenAndServe(address, nil); err != nil {
 		return err
 	}
 	return nil

@@ -14,14 +14,18 @@ type Connector struct {
 	reverseSubscribers map[chan<- interface{}][]string
 }
 
-func NewConnector() *Connector {
-	return &Connector{
+func NewConnector(channels []string) *Connector {
+	c := &Connector{
 		mutex:              sync.RWMutex{},
 		subscribers:        make(map[string][]chan<- interface{}),
 		subscribersIndex:   make(map[string]map[chan<- interface{}]int),
 		reverseSubscribers: make(map[chan<- interface{}][]string),
 		receiveData:        make(chan FlagFields),
 	}
+	for _, channel := range channels {
+		c.subscribers[channel] = make([]chan<- interface{}, 0)
+	}
+	return c
 }
 
 func (c *Connector) Subscribe(channel string, send chan<- interface{}) {
@@ -116,5 +120,12 @@ func (c *Connector) CheckSubscribe(channel string, send chan<- interface{}) bool
 	c.mutex.RLock()
 	defer c.mutex.RUnlock()
 	_, ok := c.subscribersIndex[channel][send]
+	return ok
+}
+
+func (c *Connector) CheckExistChannel(channel string) bool {
+	c.mutex.RLock()
+	defer c.mutex.RUnlock()
+	_, ok := c.subscribers[channel]
 	return ok
 }

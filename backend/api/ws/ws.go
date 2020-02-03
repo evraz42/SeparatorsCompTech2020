@@ -175,6 +175,9 @@ func (ch *Channel) handlerPacket(pkt []byte) error {
 		if err != nil {
 			return &models.ErrorResponse{Message: "Invalid request", Code: http.StatusBadRequest, Err: err}
 		}
+		if !ch.connector.CheckExistChannel(subMsg.IDDevice.IDDevice) {
+			return &models.ErrorResponse{Message: "The device not exist", Code: http.StatusOK}
+		}
 		if ch.connector.CheckSubscribe(subMsg.IDDevice.IDDevice, ch.send) {
 			return &models.ErrorResponse{Message: "You are already subscribed to this device", Code: http.StatusOK}
 		}
@@ -186,6 +189,9 @@ func (ch *Channel) handlerPacket(pkt []byte) error {
 		err = json.Unmarshal(pkt, &unSubMsg)
 		if err != nil {
 			return &models.ErrorResponse{Message: "Invalid request", Code: http.StatusBadRequest, Err: err}
+		}
+		if !ch.connector.CheckExistChannel(unSubMsg.IDDevice.IDDevice) {
+			return &models.ErrorResponse{Message: "The device not exist", Code: http.StatusOK}
 		}
 		if !ch.connector.CheckSubscribe(unSubMsg.IDDevice.IDDevice, ch.send) {
 			return &models.ErrorResponse{Message: "You are not subscribed to this device", Code: http.StatusOK}

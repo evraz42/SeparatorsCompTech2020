@@ -14,6 +14,7 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -72,7 +73,7 @@ func main() {
 	log.Info("Running monitoring...")
 	metrics := monitoring.Monitoring{}
 	pool.Schedule(func() {
-		err = metrics.Run()
+		err = metrics.Run(config.MetricsAddress)
 		if err != nil {
 			log.Warn(err)
 		}
@@ -81,7 +82,12 @@ func main() {
 
 	// Connector -------------------------------------------------------------------------------------------------------
 
-	connector := models.NewConnector()
+	devices, err := db.GetDevices()
+	if err != nil {
+		log.Warn(err)
+		os.Exit(4)
+	}
+	connector := models.NewConnector(devices.GetIDs())
 	pool.Schedule(func() {
 		for {
 			connector.Run()

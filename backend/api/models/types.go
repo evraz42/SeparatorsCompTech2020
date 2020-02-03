@@ -79,7 +79,7 @@ type DataMessageResponse struct {
 }
 
 type DevicesListResponse struct {
-	Devices []Devices `json:"devices"`
+	Devices []Device `json:"devices"`
 }
 
 type InfoResponse struct {
