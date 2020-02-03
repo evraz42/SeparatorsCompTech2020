@@ -205,7 +205,6 @@ func (ch *Channel) handlerPacket(pkt []byte) error {
 		if err != nil {
 			return &models.ErrorResponse{Message: "Invalid request", Code: http.StatusBadRequest, Err: err}
 		}
-		log.Infof("%#v", histMsg.Filters)
 		flags, err := ch.db.GetHistoricalData(histMsg.Filters, histMsg.Sort, histMsg.Limit, histMsg.Offset)
 		if err != nil {
 			return &models.ErrorResponse{Message: "Internal error", Code: http.StatusInternalServerError,
