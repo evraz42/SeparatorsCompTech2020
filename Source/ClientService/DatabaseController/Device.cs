@@ -1,9 +1,8 @@
+using DatabaseController.DataTypesInterfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-
-using DatabaseController.DataTypesInterfaces;
 
 namespace DatabaseController
 {
@@ -29,5 +28,47 @@ namespace DatabaseController
 
         [NotMapped]
         public int[] FlagsPosition { get; set; }
+
+        public bool IsValid()
+        {
+            foreach(var flag in flags)
+            {
+                if(!flag.IsValid())
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is Device deviceObj))
+            { 
+                return false;
+            }
+
+            if (!deviceObj.name_device.Equals(name_device))
+            {
+                return false;
+            }
+            if (deviceObj.number_device != number_device)
+            {
+                return false;
+            }
+            if(deviceObj.flags.Count != flags.Count)
+            {
+                return false;
+            }
+
+            foreach(var flag in deviceObj.flags)
+            {
+                if(!flags.Contains(flag))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
     }
 }

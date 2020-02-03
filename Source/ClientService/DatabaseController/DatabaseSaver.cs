@@ -1,7 +1,8 @@
-﻿using System.Drawing;
+﻿using DatabaseController.DataTypesInterfaces;
+using System;
+using System.Drawing;
 using System.IO;
 using System.Linq;
-using DatabaseController.DataTypesInterfaces;
 
 namespace DatabaseController
 {
@@ -18,12 +19,16 @@ namespace DatabaseController
 
         public void Save()
         {
-            SavePicture();
-            if (!CompareWithLast())
+            if(!_savedDevice.IsValid())
+            {
+                return;
+            }
+            if (EqualsWithLast())
             {
                 return;
             }
 
+            _savedDevice.id_device = new Guid();
             SavePicture();
 
             using var context = new DatabaseContext();
@@ -31,39 +36,30 @@ namespace DatabaseController
             context.SaveChanges();
         }
 
-        private void DrawRectangle(Image image)
-        {
-            using var g = Graphics.FromImage(image);
-            g.DrawRectangle(new Pen(Color.Red, 3),
-                new Rectangle(
-                    _savedDevice.FlagsPosition[0],
-                    _savedDevice.FlagsPosition[1],
-                    _savedDevice.FlagsPosition[2],
-                    _savedDevice.FlagsPosition[3]));
-        }
+        
 
         private void SavePicture()
         {
+            using var stream = new MemoryStream(_picture);
+            var image = Image.FromStream(stream);
 
-           
+            ImageProcessor.DrawRectangle(
+                image,
+                _savedDevice.FlagsPosition[0],
+                _savedDevice.FlagsPosition[1],
+                _savedDevice.FlagsPosition[2],
+                _savedDevice.FlagsPosition[3]);
 
-            //DrawRectangle(image);
-
-            //foreach(var flag in _savedDevice.flags)
+            foreach (var flag in _savedDevice.flags)
             {
-                var savedPath = "C:/Users/kindl/Downloads/rrt.jpg";
-                //flag.image_path = savedPath;
-                //File.WriteAllBytes(savedPath, GetOneDimensionalArray(_picture));
-
-
-                //image.Save(savedPath);
+                var savedPath = "~/files/" + _savedDevice.id_device.ToString()+ ".jpg";
+                flag.image_path = savedPath;
+                flag.time = new System.DateTimeOffset();
+                image.Save(savedPath);
             }
         }
 
-
-
-
-        private bool CompareWithLast()
+        private bool EqualsWithLast()
         {
             using var context = new DatabaseContext();
             var lastDevice = context.Devices.Last();
@@ -71,7 +67,6 @@ namespace DatabaseController
             {
                 return true;
             }
-
             return false;
         }
     }

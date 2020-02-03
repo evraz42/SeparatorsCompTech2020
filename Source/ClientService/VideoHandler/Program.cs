@@ -1,5 +1,4 @@
-﻿
-namespace VideoHandler
+﻿namespace VideoHandler
 {
     class Program
     {

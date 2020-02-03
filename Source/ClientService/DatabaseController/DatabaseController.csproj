@@ -101,6 +101,7 @@
     <Compile Include="Device.cs" />
     <Compile Include="Flag.cs" />
     <Compile Include="DataTypesInterfaces\IDevice.cs" />
+    <Compile Include="ImageProcessor.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

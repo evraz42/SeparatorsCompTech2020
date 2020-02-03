@@ -1,4 +1,5 @@
 ﻿using DatabaseController;
+using DatabaseController.DataTypesInterfaces;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using System;
@@ -6,8 +7,6 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
-using DatabaseController.DataTypesInterfaces;
-using Moq;
 
 namespace WebServiceConnection
 {
@@ -33,6 +32,10 @@ namespace WebServiceConnection
                 using var response = await GetResponse();
                 response.EnsureSuccessStatusCode();
                 device = await GetResponseObject(response);
+                if(device == null)
+                {
+                    return;
+                }
             }
             catch (HttpRequestException e)
             {
@@ -56,13 +59,16 @@ namespace WebServiceConnection
             return await Client.PostAsync(_uri, content);
         }
 
-        [NotNull]
+        [CanBeNull]
         private async Task<IDevice> GetResponseObject([NotNull]HttpResponseMessage response)
         {
             var responseBody = await response.Content.ReadAsStringAsync();
-
-            //var separator = Validator.Validate(JsonConvert.DeserializeObject(responseBody));
-            return null;
+            var obj = JsonConvert.DeserializeObject(responseBody);
+            if (!(obj is Device deviceObj))
+            {
+                return null;
+            }
+            return deviceObj;
         }
     }
 }

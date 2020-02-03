@@ -1,7 +1,7 @@
+using DatabaseController.DataTypesInterfaces;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using DatabaseController.DataTypesInterfaces;
 
 namespace DatabaseController
 {
@@ -24,5 +24,33 @@ namespace DatabaseController
         public float current_probability { get; set; }
 
         public virtual Device devices { get; set; }
+
+        public bool IsValid()
+        {
+            return current_position == null ? false : true;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is Flag flagObj))
+            {
+                return false;
+            }
+
+            if (!flagObj.id_device.Equals(id_device))
+            {
+                return false;
+            }
+            if (flagObj.type_flag != type_flag)
+            {
+                return false;
+            }
+            if (flagObj.current_position != current_position)
+            {
+                return false;
+            }
+
+            return true;
+        }
     }
 }
