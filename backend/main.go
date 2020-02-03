@@ -3,6 +3,7 @@ package main
 import (
 	"evraz/SeparatorsCompTech2020/backend/api/models"
 	websocket "evraz/SeparatorsCompTech2020/backend/api/ws"
+	"evraz/SeparatorsCompTech2020/backend/monitoring"
 	"evraz/SeparatorsCompTech2020/backend/util/gpool"
 	"evraz/SeparatorsCompTech2020/backend/util/logging"
 	"fmt"
@@ -65,6 +66,18 @@ func main() {
 	// Pool of goroutines ----------------------------------------------------------------------------------------------
 
 	pool := gpool.NewPool(1000)
+
+	// Monitoring ------------------------------------------------------------------------------------------------------
+
+	log.Info("Running monitoring...")
+	metrics := monitoring.Monitoring{}
+	pool.Schedule(func() {
+		err = metrics.Run()
+		if err != nil {
+			log.Warn(err)
+		}
+	})
+	log.Info("Run monitoring")
 
 	// Connector -------------------------------------------------------------------------------------------------------
 
@@ -144,6 +157,7 @@ func main() {
 				err = poller.Start(desc, func(ev netpoll.Event) {
 					if ev&netpoll.EventReadHup != 0 {
 						log.Info("Close conn")
+						metrics.WsConnections.Dec()
 						err = poller.Stop(desc)
 						if err != nil {
 							log.Error(err)
@@ -173,6 +187,7 @@ func main() {
 				if err != nil {
 					log.Error(err)
 				}
+				metrics.WsConnections.Inc()
 			})
 			if err != nil {
 				log.Warn("Mo free workers")

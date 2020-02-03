@@ -1,21 +1,29 @@
 package monitoring
 
 import (
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	log "github.com/sirupsen/logrus"
 	"net/http"
 )
 
 type Monitoring struct {
+	WsConnections prometheus.Gauge
 }
 
-func (m *Monitoring) Run() {
+func (m *Monitoring) Run() error {
+	m.WsConnections = prometheus.NewGauge(
+		prometheus.GaugeOpts{
+			Name: "ws_connections",
+		})
+	err := prometheus.Register(m.WsConnections)
+	if err != nil {
+		return err
+	}
+
 	http.Handle("/metrics", promhttp.Handler())
 
-	for {
-		if err := http.ListenAndServe(":2112", nil); err != nil {
-			log.Error(err)
-		}
-
+	if err := http.ListenAndServe(":2112", nil); err != nil {
+		return err
 	}
+	return nil
 }
