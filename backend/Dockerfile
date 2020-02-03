@@ -14,7 +14,7 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -ldflag
 FROM scratch
 
 COPY --from=builder /go/bin/backend /go/bin/backend
-COPY --from=builder $GOPATH/src/evraz/SeparatorsCompTech2020/backend/config.yml /go/bin/backend
+COPY --from=builder config.yml /go/bin/config.yml
 
 EXPOSE $METRICS_ADDRESS
 EXPOSE $WS_ADDRESS

@@ -36,22 +36,22 @@ func (db *DB) GetHistoricalData(filters *Filters, sort *SortFlags, limit int, of
 			query = query.Where("id_device = $1", filters.IDDevice.IDDevice)
 		}
 		if filters.StartTime != nil {
-			query = query.Where("time >= $1", time.Unix(0, *filters.StartTime))
+			query = query.Where("time >= $2", time.Unix(0, (*filters.StartTime)*1000))
 		}
 		if filters.EndTime != nil {
-			query = query.Where("time <= $1", time.Unix(0, *filters.EndTime))
+			query = query.Where("time <= $3", time.Unix(0, *filters.EndTime*1000))
 		}
 		if filters.TypeFlag != nil && *filters.TypeFlag != 0 {
-			query = query.Where("type_flag = $1", filters.TypeFlag)
+			query = query.Where("type_flag = $4", filters.TypeFlag)
 		}
 		if filters.Positions != nil {
-			query = query.Where("current_position = ANY($1)", pq.Array(filters.Positions))
+			query = query.Where("current_position = ANY($5)", pq.Array(filters.Positions))
 		}
 		if filters.ProbabilityCurrentMax != nil {
-			query = query.Where("current_probability <= $1", filters.ProbabilityCurrentMax)
+			query = query.Where("current_probability <= $6", filters.ProbabilityCurrentMax)
 		}
 		if filters.ProbabilityCurrentMin != nil {
-			query = query.Where("current_probability >= $1", filters.ProbabilityCurrentMin)
+			query = query.Where("current_probability >= $7", filters.ProbabilityCurrentMin)
 		}
 	}
 
