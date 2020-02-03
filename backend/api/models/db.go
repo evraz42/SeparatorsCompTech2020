@@ -36,10 +36,10 @@ func (db *DB) GetHistoricalData(filters *Filters, sort *SortFlags, limit int, of
 			query = query.Where("id_device = ?", filters.IDDevice.IDDevice)
 		}
 		if filters.StartTime != nil {
-			query = query.Where("time >= ?", time.Unix(0, (*filters.StartTime)*1000))
+			query = query.Where("time >= ?", time.Unix(0, (*filters.StartTime)*1000000))
 		}
 		if filters.EndTime != nil {
-			query = query.Where("time <= ?", time.Unix(0, *filters.EndTime*1000))
+			query = query.Where("time <= ?", time.Unix(0, *filters.EndTime*1000000))
 		}
 		if filters.TypeFlag != nil && *filters.TypeFlag != 2 {
 			query = query.Where("type_flag = ?", filters.TypeFlag)

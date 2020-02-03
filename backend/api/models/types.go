@@ -102,5 +102,5 @@ type Time struct {
 }
 
 func (t Time) MarshalJSON() ([]byte, error) {
-	return json.Marshal(t.Time.UnixNano() / 1000)
+	return json.Marshal(t.Time.UnixNano() / 1000000)
 }
