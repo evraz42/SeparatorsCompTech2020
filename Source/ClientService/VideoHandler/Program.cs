@@ -11,19 +11,21 @@ namespace VideoHandler
             {
                 Console.WriteLine("Usage: ProgramName.exe <File/camera path> [period (sec)]");
             }
-            if(!File.Exists(args[0]))
+            var filePath = args[0];
+            if (!File.Exists(filePath))
             {
-                Console.WriteLine("Error: File does not exist!");
+                Console.WriteLine("Error: Path is invalid!");
             }
 
             CameraControl cameraControl;
             if (int.TryParse(args[1], out var secDelay))
+            if (args.Length == 2 && int.TryParse(args[1], out var secDelay))
             {
-                cameraControl = new CameraControl("C:/Users/kindl/Downloads/asds.avi", secDelay);
+                cameraControl = new CameraControl(filePath, secDelay);
             }
             else
             {
-                cameraControl = new CameraControl("C:/Users/kindl/Downloads/asds.avi");
+                cameraControl = new CameraControl(filePath);
             }
             cameraControl.Run();
         }
