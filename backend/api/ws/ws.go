@@ -45,6 +45,8 @@ func NewChannel(conn net.Conn, pool *gpool.Pool, connector *models.Connector, db
 func (ch *Channel) Close() error {
 	ch.connector.UnSubscribeAll(ch.send)
 	ch.close <- struct{}{}
+	close(ch.send)
+	close(ch.close)
 	return ch.conn.Close()
 }
 
@@ -183,9 +185,9 @@ func (ch *Channel) handlerPacket(pkt []byte) error {
 		if err != nil {
 			return &models.ErrorResponse{Message: "Invalid request", Code: http.StatusBadRequest, Err: err}
 		}
-		if ch.connector.CheckSubscribe(subMsg.IDDevice.IDDevice, ch.send) {
+		/*if ch.connector.CheckSubscribe(subMsg.IDDevice.IDDevice, ch.send) {
 			return &models.ErrorResponse{Message: "You are already subscribed to this device", Code: http.StatusOK}
-		}
+		}*/
 		ch.connector.Subscribe(subMsg.IDDevice.IDDevice, ch.send)
 		ch.SendResponse(models.RequestTypeInfo, requestHeader.Nonce, models.InfoResponse{Status: "Successful subscribe"})
 
@@ -195,9 +197,9 @@ func (ch *Channel) handlerPacket(pkt []byte) error {
 		if err != nil {
 			return &models.ErrorResponse{Message: "Invalid request", Code: http.StatusBadRequest, Err: err}
 		}
-		if !ch.connector.CheckSubscribe(unSubMsg.IDDevice.IDDevice, ch.send) {
+		/*if !ch.connector.CheckSubscribe(unSubMsg.IDDevice.IDDevice, ch.send) {
 			return &models.ErrorResponse{Message: "You are not subscribed to this device", Code: http.StatusOK}
-		}
+		}*/
 		ch.connector.UnSubscribe(unSubMsg.IDDevice.IDDevice, ch.send)
 		ch.SendResponse(models.RequestTypeInfo, requestHeader.Nonce, models.InfoResponse{Status: "Successful unsubscribe"})
 
