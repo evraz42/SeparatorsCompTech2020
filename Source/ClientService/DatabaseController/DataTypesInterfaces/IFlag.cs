@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace DatabaseController.DataTypesInterfaces
 {
@@ -11,6 +12,8 @@ namespace DatabaseController.DataTypesInterfaces
         DateTimeOffset time { get; set; }
 
         short type_flag { get; set; }
+
+        List<float> positions { get; set; }
 
         string image_path { get; set; }
 

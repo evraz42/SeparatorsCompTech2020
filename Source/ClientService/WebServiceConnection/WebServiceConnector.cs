@@ -1,6 +1,7 @@
 ﻿using DatabaseController;
 using DatabaseController.DataTypesInterfaces;
 using JetBrains.Annotations;
+using Moq;
 using Newtonsoft.Json;
 using System;
 using System.Net.Http;
@@ -26,24 +27,48 @@ namespace WebServiceConnection
 
         public async void Send()
         {
-            IDevice device = null;
-            try
-            {
-                using var response = await GetResponse();
-                response.EnsureSuccessStatusCode();
-                device = await GetResponseObject(response);
-                if(device == null)
-                {
-                    //logging
-                    return;
-                }
-            }
-            catch (HttpRequestException e)
-            {
-                //logging
-            }
+            Device device = null;
+            //try
+            //{
+            //    using var response = await GetResponse();
+            //    response.EnsureSuccessStatusCode();
+                //device = await GetResponseObject(response);
+                //if(device == null)
+                //{
+                //    //logging
+                //    return;
+                //}
+            //}
+            //catch (HttpRequestException e)
+            //{
+            //    //logging
+            //}
 
-            //var deviceMock = new Mock<IDevice>();
+            device = new Device
+            {
+                name_device = "separator",
+                number_device = 1,
+                id_device = Guid.NewGuid()
+            };
+            device.flags.Add(
+                new Flag
+                {
+                    TypeFlag = 0,
+                    CurrentPosition = 1,
+                    CurrentProbability = (float)0.95,
+                    Positions = new float[] { 1, 2, 3, 4, 5, 6, 7 },
+                    devices = (Device)device
+                });
+            
+            device.flags.Add(
+                new Flag
+                {
+                    TypeFlag = 1,
+                    CurrentPosition = 1,
+                    CurrentProbability = (float)0.95,
+                    Positions = new float[] { 1, 2, 3, 4, 5, 6, 7 },
+                    devices = (Device)device
+                });
 
             new DatabaseSaver(device, _picture).Save();
 
@@ -61,7 +86,7 @@ namespace WebServiceConnection
         }
 
         [CanBeNull]
-        private async Task<IDevice> GetResponseObject([NotNull]HttpResponseMessage response)
+        private async Task<Device> GetResponseObject([NotNull]HttpResponseMessage response)
         {
             var responseBody = await response.Content.ReadAsStringAsync();
             var obj = JsonConvert.DeserializeObject(responseBody);

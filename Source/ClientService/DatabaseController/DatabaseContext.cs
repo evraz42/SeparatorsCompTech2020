@@ -6,13 +6,13 @@ namespace DatabaseController
     public partial class DatabaseContext : DbContext
     {
         public DatabaseContext()
-            : base("name=DatabaseModel")
+            : base("Host=localhost;Database=SeparatorsCompTech2020;Username=postgres;Password=1234")
         {
         }
 
-        public virtual DbSet<IDevice> Devices { get; set; }
-        public virtual DbSet<IFlag> Flags { get; set; }
-        public virtual DbSet<ILog> Logs { get; set; }
+        public virtual DbSet<Device> Devices { get; set; }
+        public virtual DbSet<Flag> Flags { get; set; }
+        public virtual DbSet<Log> Logs { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

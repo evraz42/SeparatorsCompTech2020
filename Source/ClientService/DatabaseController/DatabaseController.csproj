@@ -98,6 +98,7 @@
     <Compile Include="DatabaseSaver.cs" />
     <Compile Include="DataTypesInterfaces\IFlag.cs" />
     <Compile Include="DataTypesInterfaces\ILog.cs" />
+    <Compile Include="NpgSqlConfiguration.cs" />
     <Compile Include="Device.cs" />
     <Compile Include="Flag.cs" />
     <Compile Include="DataTypesInterfaces\IDevice.cs" />

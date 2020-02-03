@@ -1,5 +1,6 @@
 ﻿using Emgu.CV;
 using JetBrains.Annotations;
+using System.Diagnostics;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Threading;
@@ -25,6 +26,8 @@ namespace VideoHandler
 
         public void Run()
         {
+            Stopwatch timer = new Stopwatch();
+            timer.Start();
             while (true)
             {
                 var image = _capture.QueryFrame();
@@ -34,10 +37,15 @@ namespace VideoHandler
                     continue;
                 }
 
+                if(timer.ElapsedMilliseconds < _msDelay)
+                {
+                    continue;
+                }
+
                 using var stream = new MemoryStream();
                 image.Bitmap?.Save(stream, ImageFormat.Jpeg);
                 new WebServiceConnector(stream.ToArray()).Send();
-                Thread.Sleep(_msDelay);
+                timer.Restart();
             }
         }
     }

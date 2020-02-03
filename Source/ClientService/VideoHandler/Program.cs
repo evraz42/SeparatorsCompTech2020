@@ -9,11 +9,12 @@ namespace VideoHandler
         {
             if(args.Length < 1 || args.Length > 2)
             {
-                Console.WriteLine("Usage: ProgramName.exe <File/camera path> [period (sec)]");
+                Console.WriteLine("Usage: [ProgramName].exe <File/camera path> [period (sec)]");
             }
             var filePath = args[0];
             if (!File.Exists(filePath))
             {
+                //logging
                 Console.WriteLine("Error: Path is invalid!");
             }
 
