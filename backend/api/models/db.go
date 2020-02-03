@@ -41,7 +41,7 @@ func (db *DB) GetHistoricalData(filters *Filters, sort *SortFlags, limit int, of
 		if filters.EndTime != nil {
 			query = query.Where("time <= ?", time.Unix(0, *filters.EndTime*1000))
 		}
-		if filters.TypeFlag != nil && *filters.TypeFlag != 0 {
+		if filters.TypeFlag != nil && *filters.TypeFlag != 2 {
 			query = query.Where("type_flag = ?", filters.TypeFlag)
 		}
 		if filters.Positions != nil {
