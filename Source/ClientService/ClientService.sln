@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebServiceConnection", "Web
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatabaseController", "DatabaseController\DatabaseController.csproj", "{33FC05CB-E8B9-4B5E-B3CA-8591A79745E7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataControllerCore", "DataControllerCore\DataControllerCore.csproj", "{2811A75F-436F-47C1-8967-74310FF0AC5B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataControllerCore", "DataControllerCore\DataControllerCore.csproj", "{2811A75F-436F-47C1-8967-74310FF0AC5B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

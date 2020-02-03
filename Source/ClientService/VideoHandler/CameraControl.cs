@@ -26,11 +26,11 @@ namespace VideoHandler
 
         public void Run()
         {
-            Stopwatch timer = new Stopwatch();
+            var timer = new Stopwatch();
             timer.Start();
             while (true)
             {
-                var image = _capture.QueryFrame();
+                using var image = _capture.QueryFrame();
                 if(image == null)
                 {
                     //logging

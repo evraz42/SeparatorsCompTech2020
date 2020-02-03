@@ -1,5 +1,4 @@
-﻿using DatabaseController;
-using DatabaseController.DataTypesInterfaces;
+﻿using DataControllerCore;
 using JetBrains.Annotations;
 using Moq;
 using Newtonsoft.Json;
@@ -46,28 +45,28 @@ namespace WebServiceConnection
 
             device = new Device
             {
-                name_device = "separator",
-                number_device = 1,
-                id_device = Guid.NewGuid()
+                NameDevice = "separator",
+                NumberDevice = 1,
+                IdDevice = Guid.NewGuid()
             };
-            device.flags.Add(
+            device.Flags.Add(
                 new Flag
                 {
                     TypeFlag = 0,
                     CurrentPosition = 1,
                     CurrentProbability = (float)0.95,
                     Positions = new float[] { 1, 2, 3, 4, 5, 6, 7 },
-                    devices = (Device)device
+                    IdDeviceNavigation = (Device)device
                 });
             
-            device.flags.Add(
+            device.Flags.Add(
                 new Flag
                 {
                     TypeFlag = 1,
                     CurrentPosition = 1,
                     CurrentProbability = (float)0.95,
                     Positions = new float[] { 1, 2, 3, 4, 5, 6, 7 },
-                    devices = (Device)device
+                    IdDeviceNavigation = (Device)device
                 });
 
             new DatabaseSaver(device, _picture).Save();

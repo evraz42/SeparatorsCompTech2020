@@ -19,7 +19,6 @@ namespace VideoHandler
             }
 
             CameraControl cameraControl;
-            if (int.TryParse(args[1], out var secDelay))
             if (args.Length == 2 && int.TryParse(args[1], out var secDelay))
             {
                 cameraControl = new CameraControl(filePath, secDelay);
