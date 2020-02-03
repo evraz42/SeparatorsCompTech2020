@@ -49,6 +49,11 @@ func (ch *Channel) Close() error {
 }
 
 func (ch *Channel) Receive() {
+	defer func() {
+		if r := recover(); r != nil {
+			log.Error(r)
+		}
+	}()
 	reader := wsutil.NewServerSideReader(ch.conn)
 
 	pkt, err := ch.readPacket(reader)
@@ -102,6 +107,11 @@ func (ch *Channel) SendErrorResponse(nonce int64, message string, code int) {
 }
 
 func (ch *Channel) writer() {
+	defer func() {
+		if r := recover(); r != nil {
+			log.Error(r)
+		}
+	}()
 	writer := wsutil.NewWriter(ch.conn, ws.StateServerSide, ws.OpText)
 	encoder := json.NewEncoder(writer)
 
