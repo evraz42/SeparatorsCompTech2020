@@ -1,0 +1,5 @@
+classes= 1  
+train  = /home/copatych/Projects/CompTech2020evraz/training_yolo/train.txt
+valid  = /home/copatych/Projects/CompTech2020evraz/training_yolo/test.txt
+names = /home/copatych/Projects/CompTech2020evraz/training_yolo/objects.names
+backup = /home/copatych/Projects/CompTech2020evraz/training_yolo/weights/
