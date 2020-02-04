@@ -4,22 +4,22 @@ namespace WebService.DataTypesInterfaces
 {
     public interface IFlag
     {
-        int id { get; set; }
+        int Id { get; set; }
 
-        Guid id_device { get; set; }
+        Guid IdDevice { get; set; }
 
-        DateTimeOffset time { get; set; }
+        DateTime Time { get; set; }
 
-        short type_flag { get; set; }
+        short TypeFlag { get; set; }
 
-        string image_path { get; set; }
+        float[] Positions { get; set; }
 
-        int? current_position { get; set; }
+        string ImagePath { get; set; }
 
-        float current_probability { get; set; }
+        int? CurrentPosition { get; set; }
 
-        IDevice devices { get; set; }
+        float CurrentProbability { get; set; }
 
-        bool IsValid();
+        IDevice IdDeviceNavigation { get; set; }
     }
 }

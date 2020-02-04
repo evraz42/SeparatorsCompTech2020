@@ -87,11 +87,11 @@
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\PredictionController.cs" />
+    <Compile Include="DataTypesInterfaces\IDevice.cs" />
+    <Compile Include="DataTypesInterfaces\IFlag.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="DataTypesInterfaces\IDevice.cs" />
-    <Compile Include="DataTypesInterfaces\IFlag.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
