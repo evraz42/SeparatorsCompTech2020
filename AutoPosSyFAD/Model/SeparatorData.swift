@@ -9,9 +9,9 @@
 import Foundation
 
 struct SeparatorData {
-    let date: String
+    let date: Int64
     let type: Int
     let position: Int
-    let currentProbability: Int
+    let currentProbability: Double
     let img: String
 }

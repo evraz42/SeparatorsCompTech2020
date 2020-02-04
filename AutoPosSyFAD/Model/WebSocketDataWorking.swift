@@ -8,20 +8,30 @@
 
 import Foundation
 
+protocol WebSocketDataDelegate {
+    func getSeparatorData(for: Separator)
+}
+
+protocol TableViewDataDelegate {
+    func updateTableViewData()
+    func clearTableViewData()
+}
+
 class WebSocketDataWorking: WebSocketConnectionDelegate {
     
     var webSocketConnection: WebSocketConnection!
+    var webSocketDataDelegate: WebSocketDataDelegate?
+    var tableViewDataDelegate: TableViewDataDelegate?
     
     var separatorsData: [Separator] = []
-    
+    var connect: Bool?
     var request: String?
     var nonce: Int = 0
-    var requestID: LatestRequestID?
     
     func initConnection() {
-        webSocketConnection = WebSocketTaskConnection(url: URL(string: "ws://1.1.1.1/api/v1")!)
+        webSocketConnection = WebSocketTaskConnection(url: URL(string: "ws://35.169.150.209:2092/api/v1")!)
         webSocketConnection.delegate = self
-           
+        
         webSocketConnection.connect()
         listOfDevicesRequest()
     }
@@ -33,67 +43,65 @@ class WebSocketDataWorking: WebSocketConnectionDelegate {
             \"nonce\": \(nonce)
         }
         """
-        requestID?.listOfDevices = nonce
         nonce += 1
         webSocketConnection.send(text: request!)
     }
     
-    func subscribeRequest() {
+    func subscribeRequest(_ deviceID: String) {
         request = """
         {
             \"type\": \"subscribe\",
-            \"nonce\": \(nonce)
-            \"id_device\": int
+            \"nonce\": \(nonce),
+            \"id_device\": \"\(deviceID)\"
         }
         """
-        requestID?.subscribe = nonce
         nonce += 1
         webSocketConnection.send(text: request!)
     }
     
-    func unsubscribeRequest() {
+    func unsubscribeRequest(_ deviceID: String) {
         request = """
         {
             \"type\": \"unsubscribe\",
-            \"nonce\": \(nonce)
-            \"id_device\": int
+            \"nonce\": \(nonce),
+            \"id_device\": \"\(deviceID)\"
         }
         """
-        requestID?.unsubscribe = nonce
         nonce += 1
         webSocketConnection.send(text: request!)
     }
     
-    func historicalRequest(_ requestParam: RequestParameters) {
+    func historicalRequest(_ filter: FiltersParameters, _ sort: SortParameters, _ deviceID: String) {
         request = """
         {
             \"type\": \"historical\",
             \"nonce\": \(nonce),
             \"filters\":
             {
-                \"start_time\": \(requestParam.minDate),
-                \"end_time\": \(requestParam.maxDate),
-                \"type_flag\": \(requestParam.flagType),
-                \"positions\": \(requestParam.flagPositions),
-                \"probability_current_max\": \(requestParam.maxCurProbability),
-                \"probability_current_min\": \(requestParam.minCurProbability)
+                \"id_device\": \"\(deviceID)\",
+                \"start_time\": \(filter.minDate*1000),
+                \"end_time\": \(filter.maxDate*1000),
+                \"type_flag\": \(filter.flagType),
+                \"positions\": \(filter.flagPositions),
+                \"probability_current_max\": \(filter.maxCurProbability),
+                \"probability_current_min\": \(filter.minCurProbability)
             },
             \"sort\": {
-                \"time\": 0,
-                \"position\": 0,
-                \"probability\": 0,
+                \"time\": \(sort.time),
+                \"position\": \(sort.position),
+                \"probability\": \(sort.probability)
             },
-            \"limit\": 20,
+            \"limit\": 500,
             \"offset\": 0
         }
         """
-        requestID?.historical = nonce
         nonce += 1
         webSocketConnection.send(text: request!)
     }
     
     
     func onConnected(connection: WebSocketConnection) {
+        tableViewDataDelegate?.updateTableViewData()
         print("Connected")
     }
     
@@ -110,47 +118,124 @@ class WebSocketDataWorking: WebSocketConnectionDelegate {
     }
     
     func onMessage(connection: WebSocketConnection, text: String) {
-        print("Text message: \(text)")
+        if let data = text.data(using: String.Encoding.utf8) {
+            do {
+                let dictonary =  try JSONSerialization.jsonObject(with: data, options: [.allowFragments]) as? [String:AnyObject]
+                if let responseDictionary = dictonary {
+                    guard let msgType = responseDictionary["type"] else {
+                        return
+                    }
+                    switch msgType as? String {
+                    case "info":
+                        let body = responseDictionary["body"] as! [String: AnyObject]
+                        print(body["status"] as Any)
+                    case "error":
+                        let body = responseDictionary["body"] as! [String: AnyObject]
+                        let message = body["message"] as! String
+                        print(message)
+                    case "devices_list":
+                        let body = responseDictionary["body"] as! [String: AnyObject]
+                        let devices = body["devices"] as! [AnyObject]
+                        for device in devices {
+                            let newDevice = device as! [String: AnyObject]
+                            let separator = Separator()
+                            separator.ID = newDevice["id_device"] as? String
+                            separator.name = newDevice["name_device"] as? String
+                            separator.number = newDevice["number_device"] as? Int
+                            separatorsData.append(separator)
+                        }
+                    case "data_message":
+                        if !validData(responseDictionary) { break }
+                        let deviceID = responseDictionary["id_device"] as? String
+                        let separatorData = SeparatorData(date: responseDictionary["time"] as! Int64,
+                                                          type: responseDictionary["type_flag"] as! Int,
+                                                          position: responseDictionary["current_position"] as! Int,
+                                                          currentProbability: responseDictionary["current_probability"] as! Double,
+                                                          img: responseDictionary["image_path"] as! String)
+                        for separator in separatorsData {
+                            if separator.ID! != deviceID { continue }
+                            if separator.data == nil {
+                                separator.data = [separatorData]
+                            } else {
+                                separator.data?.insert(separatorData, at: 0)
+                            }
+                            self.webSocketDataDelegate?.getSeparatorData(for: separator)
+                            self.tableViewDataDelegate?.updateTableViewData()
+                        }
+                    case "historical":
+                        let body = responseDictionary["body"] as! [String: AnyObject]
+                        let historicalSeparatorData = body["flags"] as! [AnyObject]
+                        var separator: Separator?
+                        if historicalSeparatorData.count == 0 {
+                            self.tableViewDataDelegate?.clearTableViewData()
+                            return
+                        }
+                        let oldData = historicalSeparatorData[0]
+                        let separatorID = oldData["id_device"] as! String
+                        for sep in separatorsData {
+                            if sep.ID! != separatorID { continue }
+                            sep.data = nil
+                            separator = sep
+                        }
+                        
+                        for historicalRecord in historicalSeparatorData {
+                            let oldSeparatorData = historicalRecord as! [String: AnyObject]
+                            if !validData(oldSeparatorData) { break }
+                            let separatorData = SeparatorData(date: oldSeparatorData["time"] as! Int64,
+                                                              type: oldSeparatorData["type_flag"] as! Int,
+                                                              position: oldSeparatorData["current_position"] as! Int,
+                                                              currentProbability: oldSeparatorData["current_probability"] as! Double,
+                                                              img: oldSeparatorData["image_path"] as! String)
+                            
+                            if separator!.data == nil {
+                                separator!.data = [separatorData]
+                            } else {
+                                separator!.data?.append(separatorData)
+                            }
+                        }
+                        
+                        self.webSocketDataDelegate?.getSeparatorData(for: separator!)
+                        self.tableViewDataDelegate?.updateTableViewData()
+                    default:
+                        break
+                    }
+                }
+            } catch let error as NSError {
+                print(error)
+            }
+        }
     }
     
     func onMessage(connection: WebSocketConnection, data: Data) {
         print("Data message: \(data)")
-        let id = 0
-        switch id {
-        case requestID?.listOfDevices:
-            break
-        case requestID?.historical:
-            break
-        case requestID?.subscribe:
-            break
-        case requestID?.unsubscribe:
-            break
-        default:
-            break
-        }
-        
     }
     
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    func responseData() {
-        let testSepData1 = SeparatorData(date: "24.01.2020",
-                                         type: 0,
-                                         position: 4,
-                                         currentProbability: 98,
-                                         img: "https://assets.bwbx.io/images/users/iqjWHBFdfxIU/iKIWgaiJUtss/v2/1000x-1.jpg")
-        let testSepData2 = SeparatorData(date: "29.01.2020",
-                                         type: 1,
-                                         position: 1,
-                                         currentProbability: 97,
-                                         img: "https://i.barkpost.com/wp-content/uploads/2015/02/featmeme.jpg?q=70&fit=crop&crop=entropy&w=808&h=500")
-        let testSep2 = Separator()
-        testSep2.name = "Сепаратор_2"
-        testSep2.data = [testSepData1]
-        let testSep1 = Separator()
-        testSep1.name = "Сепаратор_1"
-        testSep1.data = [testSepData1, testSepData2]
-        separatorsData.append(testSep1)
-        separatorsData.append(testSep2)
+    func validData(_ responseDictionary: [String: Any]) -> Bool {
+        guard (responseDictionary["id_device"] as? String) != nil else {
+            print("Invalid device ID data")
+            return false
+        }
+        guard (responseDictionary["time"] as? Int64) != nil else {
+            print("Invalid time data")
+            return false
+        }
+        guard (responseDictionary["type_flag"] as? Int) != nil else {
+            print("Invalid flag type data")
+            return false
+        }
+        guard (responseDictionary["current_position"] as? Int) != nil else {
+            print("Invalid current position data")
+            return false
+        }
+        guard (responseDictionary["current_probability"] as? Double) != nil else {
+            print("Invalid current probability data ")
+            return false
+        }
+        guard (responseDictionary["image_path"] as? String) != nil else {
+            print("Invalid image path data")
+            return false
+        }
+        return true
     }
     
 }

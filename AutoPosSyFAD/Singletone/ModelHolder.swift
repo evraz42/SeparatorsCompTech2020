@@ -13,3 +13,14 @@ struct ModelsHolder {
     
     let webSocketData = WebSocketDataWorking()
 }
+
+struct ViewsHolder {
+    static let instance = ViewsHolder()
+    
+    var separatorDataPage: SeparatorDataPage?
+    var settingMenuPage: SettingsMenuPage?
+}
+
+
+
+ 

@@ -12,10 +12,13 @@ class PresentDataPage: UIViewController, UITableViewDataSource, UITableViewDeleg
 
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var dataTableView: UITableView!
+    
+    private let webSocketData = ModelsHolder.instance.webSocketData
     private let cellReuseIdentifier = "DataCell"
     private var currentSection = 0
     
     var separatorData: SeparatorData?
+    var separatorID: String?
     var titles = ["Дата:", "Тип флажка:", "Позиция", "Вероятность текущей позиции:"]
     
     override func viewDidLoad() {
@@ -30,10 +33,19 @@ class PresentDataPage: UIViewController, UITableViewDataSource, UITableViewDeleg
                     self.imageView.image = UIImage(data: data)
                 }
             } else {
-                self.imageView.image = UIImage(named: "logo")
+                DispatchQueue.main.async {
+                    self.imageView.image = UIImage(named: "noImage")
+                }
                 print("Error loading image");
             }
         }
+        
+        //webSocketData.unsubscribeRequest(separatorID!)
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewWillDisappear(true)
+        //webSocketData.subscribeRequest(separatorID!)
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
@@ -63,7 +75,7 @@ class PresentDataPage: UIViewController, UITableViewDataSource, UITableViewDeleg
         var data: String?
         switch indexPath.section {
         case 0:
-            data = separator.date
+            data = Date(timeIntervalSince1970: TimeInterval((separator.date))/1000).stringValue
         case 1:
             if separator.type == 0 {
                 data = "Левый"

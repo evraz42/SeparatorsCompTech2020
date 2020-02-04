@@ -9,6 +9,8 @@
 import Foundation
 
 class Separator {
+    var ID: String?
     var name: String?
+    var number: Int?
     var data: [SeparatorData]?
 }

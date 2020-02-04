@@ -9,11 +9,14 @@
 import UIKit
 
 class SettingsMenuPage: UITableViewController {
-
     
     @IBOutlet var dateButtons: [UIButton]!
+    @IBOutlet var settingTableView: UITableView!
     @IBOutlet weak var chooseDateButton: UIButton!
     @IBOutlet weak var datePicker: UIDatePicker!
+    @IBOutlet weak var applyFilters: UIButton!
+    @IBOutlet weak var dropFilters: UIButton!
+    
     
     @IBOutlet weak var flagsController: UISegmentedControl!
     @IBOutlet weak var positionButtonsView: UIView!
@@ -22,29 +25,39 @@ class SettingsMenuPage: UITableViewController {
     @IBOutlet var currentPosSliders: [UISlider]!
     @IBOutlet var currentPosLabels: [UILabel]!
     
+    @IBOutlet var sortControllers: [UISegmentedControl]!
+    
     private let webSocketData = ModelsHolder.instance.webSocketData
     private let sliderStep: Float = 10
     private var currentDateButton: UIButton?
+    var separatorID: String?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        settingTableView.tableFooterView?.isHidden = false
+        for btn in dateButtons {
+            btn.setTitle((datePicker.date).stringValue, for: .normal)
+        }
         datePicker.isEnabled = false
+        
         //set titles color
         UISegmentedControl.appearance().setTitleTextAttributes([NSAttributedString.Key.foregroundColor: UIColor.white], for: .selected)
         //set custom style for items
-        for btn in dateButtons { AppStyle().activeCustomButton(btn) }
+        for btn in dateButtons {
+            AppStyle().activeCustomButton(btn)
+        }
+        AppStyle().activeCustomButton(applyFilters)
+        AppStyle().activeCustomButton(dropFilters)
         AppStyle().unactiveCustomButton(chooseDateButton)
         AppStyle().customizationSegmentController(positionButtons, positionButtonsView)
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        //send request to DB
-        let minDate = stringToDate(dateButtons[0].titleLabel!.text!)
-        let maxDate = stringToDate(dateButtons[1].titleLabel!.text!)
-        let startTime = Int(minDate.timeIntervalSince1970)
-        let endTime = Int(maxDate.timeIntervalSince1970)
+   
+    @IBAction func applyFiltersButtonTapped(_ sender: Any) {
+        let minDate = dateButtons[0].titleLabel!.text!.dateValue
+        let maxDate = dateButtons[1].titleLabel!.text!.dateValue
+        let startTime = Int64(minDate.timeIntervalSince1970)
+        let endTime = Int64(maxDate.timeIntervalSince1970)
         let flagType = flagsController.selectedSegmentIndex
         var flagPositions: [Int]?
         for btn in positionButtons {
@@ -59,15 +72,46 @@ class SettingsMenuPage: UITableViewController {
         let minCurProbability = Int(currentPosSliders[0].value)
         let maxCurProbability = Int(currentPosSliders[1].value)
         
-        let requestParam = RequestParameters(minDate: startTime,
-                                             maxDate: endTime,
-                                             flagType: flagType,
-                                             flagPositions: flagPositions!,
-                                             minCurProbability: minCurProbability,
-                                             maxCurProbability: maxCurProbability)
-        webSocketData.historicalRequest(requestParam)
+        let filter = FiltersParameters(minDate: startTime,
+                                                maxDate: endTime,
+                                                flagType: flagType,
+                                                flagPositions: flagPositions!,
+                                                minCurProbability: Double(minCurProbability),
+                                                maxCurProbability: Double(maxCurProbability))
+        var timeSort: Int?
+        var posSort: Int?
+        var probSort: Int?
+        for typeSort in sortControllers {
+            switch typeSort.tag {
+            case 0:
+                timeSort = typeSort.selectedSegmentIndex
+            case 1:
+                posSort = typeSort.selectedSegmentIndex
+            case 2:
+                probSort = typeSort.selectedSegmentIndex
+            default:
+                break
+            }
+
+        }
+        let sort = SortParameters(time: timeSort!, position: posSort!, probability: probSort!)
+        guard (separatorID != nil) else {
+            return
+        }
+        if webSocketData.connect! {
+            webSocketData.unsubscribeRequest(separatorID!)
+            webSocketData.connect = false
+        }
+        webSocketData.historicalRequest(filter, sort, separatorID!)
     }
     
+    @IBAction func dropFiltersButtonTapped(_ sender: Any) {
+        if !webSocketData.connect! {
+            webSocketData.subscribeRequest(separatorID!)
+            webSocketData.connect = true
+        }
+        
+    }
     
     @IBAction func dateButtonTapped(_ sender: Any) {
         currentDateButton = sender as? UIButton
@@ -86,7 +130,7 @@ class SettingsMenuPage: UITableViewController {
     @IBAction func chooseDateButtonTapped(_ sender: Any) { //This is not SOLID ;c
         var confirmDate = false
         //take current data from date picker and format them
-        let currentDate = dateToString(datePicker!.date)
+        let currentDate = datePicker!.date.stringValue
         
         confirmDate = compareDate(currentDate)
         
@@ -108,14 +152,14 @@ class SettingsMenuPage: UITableViewController {
     }
     
     func compareDate (_ currentDate: String) -> Bool {
-        let currentDate = dateToString(datePicker!.date)
+        let currentDate = datePicker!.date.stringValue
         
         switch currentDateButton!.tag {
         case 0:
-            if stringToDate(currentDate) > stringToDate(dateButtons[1].titleLabel!.text!) { break } //compare
+            if currentDate.dateValue > dateButtons[1].titleLabel!.text!.dateValue { break } //compare
             return true
         case 1:
-            if stringToDate(currentDate) < stringToDate(dateButtons[0].titleLabel!.text!) { break } //compare
+            if currentDate.dateValue < dateButtons[0].titleLabel!.text!.dateValue { break } //compare
             return true
         default:
             break
@@ -176,23 +220,14 @@ class SettingsMenuPage: UITableViewController {
         
     }
     
-    func stringToDate(_ textDate: String) -> Date {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MM/dd/yyyy HH:mm"
-        formatter.timeZone = .none
-        return formatter.date(from: textDate)!
+    @IBAction func filterSegmentControllerTapped(_ sender: Any) {
+        let segmentController = sender as! UISegmentedControl
+        for controller in sortControllers {
+            if controller == segmentController { continue }
+            if controller.selectedSegmentIndex == 0 {
+                controller.selectedSegmentIndex = 1
+            }
+        }
     }
     
-    func dateToString(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MM/dd/yyyy HH:mm"
-        formatter.timeZone = .none
-        return formatter.string(from: date)
-    }
-}
-
-extension String {
-    var floatValue: Float {
-        return (self as NSString).floatValue
-    }
 }
