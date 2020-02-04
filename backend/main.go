@@ -66,7 +66,11 @@ func main() {
 
 	// Pool of goroutines ----------------------------------------------------------------------------------------------
 
-	pool := gpool.NewPool(1000)
+	gpoolSize := 1000
+	if config.GoPoolSize != 0 {
+		gpoolSize = config.GoPoolSize
+	}
+	pool := gpool.NewPool(gpoolSize)
 
 	// Monitoring ------------------------------------------------------------------------------------------------------
 

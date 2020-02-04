@@ -8,4 +8,5 @@ type Config struct {
 	DBPass         string `yaml:"db_pass"`
 	WSAddress      string `yaml:"ws_address"`
 	MetricsAddress string `yaml:"metrics_address"`
+	GoPoolSize     int    `yaml:"go_pool_size"`
 }
