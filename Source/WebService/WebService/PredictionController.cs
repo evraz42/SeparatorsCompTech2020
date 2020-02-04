@@ -2,7 +2,6 @@
 using System.Drawing;
 using System.IO;
 using System.Web.Http;
-using WebService.DataTypesInterfaces;
 
 namespace WebService.Controllers
 {
@@ -27,13 +26,10 @@ namespace WebService.Controllers
 
             image.Save("path");
 
-            ML.Model model = new ML.Model("path");
-            model.Run();
-            Device outData;
-            // TODO
-            // Надо outData заполнить
+            var model = ML.model("path");
+            model.run();
 
-            return JsonConvert.SerializeObject(outData);
+            return JsonConvert.SerializeObject(data);
         }
     }
 }

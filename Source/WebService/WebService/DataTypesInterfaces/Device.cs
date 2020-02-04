@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-
+using WebService.DataTypesInterfaces;
 namespace WebService.DataTypesInterfaces
 {
-    [Table("public.devices")]
     public partial class Device
     {
         public Device()
@@ -24,8 +23,6 @@ namespace WebService.DataTypesInterfaces
 
         public virtual ICollection<Flag> Flags { get; set; }
 
-        [NotMapped]
-        [NotNull]
         public int[] FlagsPosition { get; set; }
 
         public bool IsValid()
