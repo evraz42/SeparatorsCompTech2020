@@ -17,12 +17,18 @@ namespace WebService.Controllers
 
             using var stream = new MemoryStream(data);
             var image = Image.FromStream(stream);
-            if(image == null)
+            if (image == null)
             {
                 return null;
             }
 
             //ml processing
+
+            image.Save("path");
+
+            var model = ML.model("path");
+            model.run();
+
             return JsonConvert.SerializeObject(data);
         }
     }
