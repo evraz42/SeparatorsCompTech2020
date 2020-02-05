@@ -1,25 +1,38 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using DatabaseControllerCore.DataInterfaces;
 
-namespace WebService.DataTypesInterfaces
+namespace DatabaseControllerCore.DatabaseTypes
 {
-    public partial class Flag
+    [Table("public.flags")]
+    public partial class Flag : IFlag
     {
+        [Key]
+        [Column("id")]
         public int Id { get; set; }
 
+        [Column("id_device")]
         public Guid IdDevice { get; set; }
 
+        [Column("time", TypeName = "timestamp with time zone")]
         public DateTime Time { get; set; }
 
+        [Column("type_flag")]
         public short TypeFlag { get; set; }
 
+        [Required]
+        [Column("positions")]
         public float[] Positions { get; set; }
 
+        [Required]
+        [Column("image_path")]
         public string ImagePath { get; set; }
 
+        [Column("current_position")]
         public int? CurrentPosition { get; set; }
 
+        [Column("current_probability")]
         public float CurrentProbability { get; set; }
 
         public virtual Device IdDeviceNavigation { get; set; }

@@ -18,10 +18,6 @@ namespace WebService.Controllers
 
             using var stream = new MemoryStream(data);
             var image = Image.FromStream(stream);
-            if (image == null)
-            {
-                return null;
-            }
 
             //ml processing
 
@@ -33,7 +29,7 @@ namespace WebService.Controllers
             // TODO
             // Надо outData заполнить
 
-            return JsonConvert.SerializeObject(outData);
+            return JsonConvert.SerializeObject(data);
         }
     }
 }

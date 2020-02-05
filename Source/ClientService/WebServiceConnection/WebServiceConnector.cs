@@ -1,5 +1,5 @@
 ﻿using DatabaseControllerCore;
-using Guard;
+using DatabaseControllerCore.DataInterfaces;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using System;
@@ -13,12 +13,12 @@ namespace WebServiceConnection
     public class WebServiceConnector
     {
         [NotNull] private static readonly HttpClient Client = new HttpClient();
-        [NotNull] private readonly byte[] _picture;
+        [NotNull] private readonly byte[] _data;
         [NotNull] private readonly Uri _uri = new Uri("http://localhost:51460/prediction");
 
         public WebServiceConnector([NotNull] byte[] data)
         {
-            _picture = data;
+            _data = data;
 
             Client.DefaultRequestHeaders.Accept.Clear();
             Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -26,7 +26,7 @@ namespace WebServiceConnection
 
         public async void Send()
         {
-            Device device = null;
+            IDevice device = null;
             try
             {
                 using var response = await GetResponse();
@@ -44,7 +44,7 @@ namespace WebServiceConnection
                 //logging
                 return;
             }
-            new DatabaseSaver(device, _picture).Save();
+            new DatabaseSaver(device, _data).Save();
 
         }
 
@@ -52,7 +52,7 @@ namespace WebServiceConnection
         private async Task<HttpResponseMessage> GetResponse()
         {
             using var content = new StringContent(
-                JsonConvert.SerializeObject(_picture), 
+                JsonConvert.SerializeObject(_data), 
                 Encoding.UTF8,
                 "application/json");
 
@@ -60,12 +60,12 @@ namespace WebServiceConnection
         }
 
         [CanBeNull]
-        private async Task<Device> GetResponseObject([NotNull]HttpResponseMessage response)
+        private async Task<IDevice> GetResponseObject([NotNull]HttpResponseMessage response)
         {
             var responseBody = await response.Content.ReadAsStringAsync();
 
             var obj = JsonConvert.DeserializeObject(responseBody);
-            if (!(obj is Device deviceObj))
+            if (!(obj is IDevice deviceObj))
             {
                 return null;
             }

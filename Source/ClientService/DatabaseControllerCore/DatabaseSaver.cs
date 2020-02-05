@@ -1,9 +1,10 @@
-﻿using JetBrains.Annotations;
+﻿using DatabaseControllerCore.DatabaseTypes;
+using JetBrains.Annotations;
 using System;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using Guard;
+using DatabaseControllerCore.DataInterfaces;
 
 namespace DatabaseControllerCore
 {
@@ -11,10 +12,11 @@ namespace DatabaseControllerCore
     {
         [NotNull] private readonly Device _savedDevice;
         [NotNull] private readonly byte[] _imageBytes;
+        [NotNull] private readonly string _savedPath = "C:/Users/User/Downloads/a/";
 
-        public DatabaseSaver([NotNull] Device savedObject, [NotNull] byte[] imageBytes)
+        public DatabaseSaver([NotNull] IDevice savedObject, [NotNull] byte[] imageBytes)
         {
-            _savedDevice = savedObject;
+            _savedDevice = (Device)savedObject;
             _imageBytes = imageBytes;
         }
 
@@ -57,7 +59,7 @@ namespace DatabaseControllerCore
                 flag.Time = DateTime.Now;
                 flag.IdDevice = _savedDevice.IdDevice;
 
-                var savedPath = "C:/Users/User/Downloads/a/" 
+                var savedPath = _savedPath 
                     + _savedDevice.NameDevice
                     + _savedDevice.NumberDevice +"_"
                     + flag.TypeFlag + "_"

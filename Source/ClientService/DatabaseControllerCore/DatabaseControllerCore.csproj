@@ -148,10 +148,12 @@
   <ItemGroup>
     <Compile Include="DatabaseContext.cs" />
     <Compile Include="DatabaseSaver.cs" />
-    <Compile Include="Device.cs" />
-    <Compile Include="Flag.cs" />
+    <Compile Include="DatabaseTypes\Device.cs" />
+    <Compile Include="DatabaseTypes\Flag.cs" />
+    <Compile Include="DatabaseTypes\Logs.cs" />
+    <Compile Include="DataInterfaces\IDevice.cs" />
+    <Compile Include="DataInterfaces\IFlag.cs" />
     <Compile Include="ImageProcessor.cs" />
-    <Compile Include="Logs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -164,11 +166,6 @@
     </None>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Guard\Guard.csproj">
-      <Project>{96BB2F01-5469-4785-A0A7-DDB12956C9E9}</Project>
-      <Name>Guard</Name>
-    </ProjectReference>
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
