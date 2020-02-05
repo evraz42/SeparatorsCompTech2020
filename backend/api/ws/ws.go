@@ -5,6 +5,7 @@ import (
 	"errors"
 	"evraz/SeparatorsCompTech2020/backend/api/models"
 	"evraz/SeparatorsCompTech2020/backend/util/gpool"
+	"evraz/SeparatorsCompTech2020/backend/util/pools"
 	"github.com/gobwas/ws"
 	"github.com/gobwas/ws/wsutil"
 	log "github.com/sirupsen/logrus"
@@ -17,39 +18,36 @@ import (
 
 type Channel struct {
 	conn         net.Conn
-	send         chan interface{}
-	close        chan struct{}
-	noWriterYet  bool
 	pool         *gpool.Pool
 	connector    *models.Connector
-	reqPerMinute [60]int
-	reqPerSecond int
+	reqPerMinute [60]uint16
+	reqPerSecond uint16
 	ban          bool
 	lastReqTime  time.Time
 	db           models.Database
+	poolReaders  *pools.ReaderPool
 }
 
-func NewChannel(conn net.Conn, pool *gpool.Pool, connector *models.Connector, db models.Database) *Channel {
+func NewChannel(conn net.Conn, pool *gpool.Pool, connector *models.Connector, db models.Database, readerPool *pools.ReaderPool) *Channel {
 	c := &Channel{
 		conn:        conn,
-		send:        make(chan interface{}),
-		close:       make(chan struct{}),
-		noWriterYet: true,
 		pool:        pool,
 		connector:   connector,
 		db:          db,
+		poolReaders: readerPool,
 	}
 	return c
 }
 
 func (ch *Channel) Close() error {
-	ch.connector.UnSubscribeAll(ch.send)
-	ch.close <- struct{}{}
+	ch.connector.UnSubscribeAll(ch)
 	return ch.conn.Close()
 }
 
 func (ch *Channel) Receive() {
-	reader := wsutil.NewServerSideReader(ch.conn)
+	reader := ch.poolReaders.Pool.Get().(*wsutil.Reader)
+	defer ch.poolReaders.Pool.Put(reader)
+	reader = wsutil.NewServerSideReader(ch.conn)
 
 	pkt, err := ch.readPacket(reader)
 	if err != nil {
@@ -77,11 +75,15 @@ func (ch *Channel) Receive() {
 }
 
 func (ch *Channel) Send(p interface{}) {
-	if ch.noWriterYet {
-		ch.noWriterYet = false
-		ch.pool.Schedule(ch.writer)
-	}
-	ch.send <- p
+	ch.pool.Schedule(func() {
+		writer := wsutil.NewWriter(ch.conn, ws.StateServerSide, ws.OpText)
+		encoder := json.NewEncoder(writer)
+		err := writePacket(writer, encoder, p)
+		if err != nil {
+			log.Error(err)
+			ch.connector.UnSubscribeAll(ch)
+		}
+	})
 }
 
 func (ch *Channel) SendResponse(typeResp string, nonce int64, p interface{}) {
@@ -99,26 +101,6 @@ func (ch *Channel) SendErrorResponse(nonce int64, message string, code int) {
 		Message: message,
 		Code:    code,
 	})
-}
-
-func (ch *Channel) writer() {
-	writer := wsutil.NewWriter(ch.conn, ws.StateServerSide, ws.OpText)
-	encoder := json.NewEncoder(writer)
-
-	for {
-		select {
-		case pkt := <-ch.send:
-			err := writePacket(writer, encoder, pkt)
-			if err != nil {
-				log.Error(err)
-				ch.connector.UnSubscribeAll(ch.send)
-			}
-		case <-ch.close:
-			close(ch.send)
-			close(ch.close)
-			return
-		}
-	}
 }
 
 func writePacket(writer *wsutil.Writer, encoder *json.Encoder, pkt interface{}) error {
@@ -178,10 +160,10 @@ func (ch *Channel) handlerPacket(pkt []byte) error {
 		if !ch.connector.CheckExistChannel(subMsg.IDDevice.IDDevice) {
 			return &models.ErrorResponse{Message: "The device not exist", Code: http.StatusOK}
 		}
-		if ch.connector.CheckSubscribe(subMsg.IDDevice.IDDevice, ch.send) {
+		if ch.connector.CheckSubscribe(subMsg.IDDevice.IDDevice, ch) {
 			return &models.ErrorResponse{Message: "You are already subscribed to this device", Code: http.StatusOK}
 		}
-		ch.connector.Subscribe(subMsg.IDDevice.IDDevice, ch.send)
+		ch.connector.Subscribe(subMsg.IDDevice.IDDevice, ch)
 		ch.SendResponse(models.RequestTypeInfo, requestHeader.Nonce, models.InfoResponse{Status: "Successful subscribe"})
 
 	case "unsubscribe":
@@ -193,10 +175,10 @@ func (ch *Channel) handlerPacket(pkt []byte) error {
 		if !ch.connector.CheckExistChannel(unSubMsg.IDDevice.IDDevice) {
 			return &models.ErrorResponse{Message: "The device not exist", Code: http.StatusOK}
 		}
-		if !ch.connector.CheckSubscribe(unSubMsg.IDDevice.IDDevice, ch.send) {
+		if !ch.connector.CheckSubscribe(unSubMsg.IDDevice.IDDevice, ch) {
 			return &models.ErrorResponse{Message: "You are not subscribed to this device", Code: http.StatusOK}
 		}
-		ch.connector.UnSubscribe(unSubMsg.IDDevice.IDDevice, ch.send)
+		ch.connector.UnSubscribe(unSubMsg.IDDevice.IDDevice, ch)
 		ch.SendResponse(models.RequestTypeInfo, requestHeader.Nonce, models.InfoResponse{Status: "Successful unsubscribe"})
 
 	case "historical":
@@ -249,8 +231,8 @@ func (ch *Channel) CheckReqLimit() bool {
 	return false
 }
 
-func sumIntArray(a [60]int) int {
-	var sum int
+func sumIntArray(a [60]uint16) uint16 {
+	var sum uint16
 	for i := 0; i < 60; i++ {
 		sum += a[i]
 	}

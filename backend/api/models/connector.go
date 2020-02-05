@@ -6,38 +6,42 @@ import (
 	"time"
 )
 
+type Sender interface {
+	Send(p interface{})
+}
+
 type Connector struct {
 	receiveData chan FlagFields
 	mutex       sync.RWMutex
-	subscribers map[string][]chan<- interface{}
+	subscribers map[string][]Sender
 
-	subscribersIndex   map[string]map[chan<- interface{}]int
-	reverseSubscribers map[chan<- interface{}][]string
+	subscribersIndex   map[string]map[Sender]int
+	reverseSubscribers map[Sender][]string
 }
 
 func NewConnector(channels []string) *Connector {
 	c := &Connector{
 		mutex:              sync.RWMutex{},
-		subscribers:        make(map[string][]chan<- interface{}),
-		subscribersIndex:   make(map[string]map[chan<- interface{}]int),
-		reverseSubscribers: make(map[chan<- interface{}][]string),
+		subscribers:        make(map[string][]Sender),
+		subscribersIndex:   make(map[string]map[Sender]int),
+		reverseSubscribers: make(map[Sender][]string),
 		receiveData:        make(chan FlagFields),
 	}
 	for _, channel := range channels {
-		c.subscribers[channel] = make([]chan<- interface{}, 0)
+		c.subscribers[channel] = make([]Sender, 0)
 	}
 	return c
 }
 
-func (c *Connector) Subscribe(channel string, send chan<- interface{}) {
+func (c *Connector) Subscribe(channel string, send Sender) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
 	if _, ok := c.subscribers[channel]; !ok {
-		c.subscribers[channel] = make([]chan<- interface{}, 0, 1)
+		c.subscribers[channel] = make([]Sender, 0, 1)
 	}
 	if _, ok := c.subscribersIndex[channel]; !ok {
-		c.subscribersIndex[channel] = make(map[chan<- interface{}]int)
+		c.subscribersIndex[channel] = make(map[Sender]int)
 	}
 
 	c.subscribers[channel] = append(c.subscribers[channel], send)
@@ -45,7 +49,7 @@ func (c *Connector) Subscribe(channel string, send chan<- interface{}) {
 	c.reverseSubscribers[send] = append(c.reverseSubscribers[send], channel)
 }
 
-func (c *Connector) UnSubscribe(channel string, send chan<- interface{}) {
+func (c *Connector) UnSubscribe(channel string, send Sender) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
@@ -82,7 +86,7 @@ func (c *Connector) UnSubscribe(channel string, send chan<- interface{}) {
 	}
 }
 
-func (c *Connector) UnSubscribeAll(send chan<- interface{}) {
+func (c *Connector) UnSubscribeAll(send Sender) {
 	c.mutex.RLock()
 	channels := c.reverseSubscribers[send]
 	c.mutex.RUnlock()
@@ -106,7 +110,7 @@ func (c *Connector) Run() {
 			msg.FlagFields = dataMsg
 			c.mutex.RLock()
 			for i := range c.subscribers[dataMsg.IDDevice.IDDevice] {
-				c.subscribers[dataMsg.IDDevice.IDDevice][i] <- msg
+				c.subscribers[dataMsg.IDDevice.IDDevice][i].Send(msg)
 			}
 			c.mutex.RUnlock()
 		case <-time.After(time.Second * 5):
@@ -119,7 +123,7 @@ func (c *Connector) GetChannel() chan<- FlagFields {
 	return c.receiveData
 }
 
-func (c *Connector) CheckSubscribe(channel string, send chan<- interface{}) bool {
+func (c *Connector) CheckSubscribe(channel string, send Sender) bool {
 	c.mutex.RLock()
 	defer c.mutex.RUnlock()
 	_, ok := c.subscribersIndex[channel][send]

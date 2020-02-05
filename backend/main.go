@@ -6,6 +6,7 @@ import (
 	"evraz/SeparatorsCompTech2020/backend/monitoring"
 	"evraz/SeparatorsCompTech2020/backend/util/gpool"
 	"evraz/SeparatorsCompTech2020/backend/util/logging"
+	"evraz/SeparatorsCompTech2020/backend/util/pools"
 	"fmt"
 	"github.com/gobwas/ws"
 	"github.com/mailru/easygo/netpoll"
@@ -84,6 +85,10 @@ func main() {
 	})
 	log.Info("Run monitoring")
 
+	// ReaderPool ------------------------------------------------------------------------------------------------------
+
+	readerPool := pools.NewReaderPool()
+
 	// Connector -------------------------------------------------------------------------------------------------------
 
 	devices, err := db.GetDevices()
@@ -153,7 +158,7 @@ func main() {
 					return
 				}
 
-				ch := websocket.NewChannel(conn, pool, connector, db)
+				ch := websocket.NewChannel(conn, pool, connector, db, readerPool)
 				ch.Send(models.InfoResponse{
 					Status: "Successful connection",
 				})
