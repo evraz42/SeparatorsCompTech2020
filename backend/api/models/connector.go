@@ -3,6 +3,7 @@ package models
 import (
 	log "github.com/sirupsen/logrus"
 	"sync"
+	"time"
 )
 
 type Connector struct {
@@ -108,6 +109,8 @@ func (c *Connector) Run() {
 				c.subscribers[dataMsg.IDDevice.IDDevice][i] <- msg
 			}
 			c.mutex.RUnlock()
+		case <-time.After(time.Second * 5):
+			log.Info(c.subscribers, c.subscribersIndex, c.reverseSubscribers)
 		}
 	}
 }

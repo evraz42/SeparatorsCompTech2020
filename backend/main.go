@@ -165,7 +165,7 @@ func main() {
 				}
 
 				err = poller.Start(desc, func(ev netpoll.Event) {
-					if ev&netpoll.EventReadHup != 0 {
+					if ev&(netpoll.EventReadHup|netpoll.EventPollerClosed|netpoll.EventErr|netpoll.EventWriteHup) != 0 {
 						log.Info("Close conn")
 						metrics.WsConnections.Dec()
 						err = poller.Stop(desc)

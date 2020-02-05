@@ -111,7 +111,7 @@ func (ch *Channel) writer() {
 			err := writePacket(writer, encoder, pkt)
 			if err != nil {
 				log.Error(err)
-				return
+				ch.connector.UnSubscribeAll(ch.send)
 			}
 		case <-ch.close:
 			close(ch.send)
