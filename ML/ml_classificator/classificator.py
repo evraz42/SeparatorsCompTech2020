@@ -22,6 +22,6 @@ class Model(object):
             self.new_val = float(str(i)) * 100
             self.new_val = round(self.new_val, 4)
             self.all_value.append(self.new_val)
-        print('\nPrediction \n{}'.format(self.all_value))
+        #print('\nPrediction \n{}'.format(self.all_value))
 
         return self.all_value

@@ -17,7 +17,7 @@ def crop_img_on_left_right(img, track_array, width_need=245 , height_need=310):
 
 
     # img [y1:y2, x1:x2]
-    left_image = img[Y1 : Y2 , X1 + middle_image - 245 : X1 + middle_image]
+    left_image = img[Y1 : Y2 , X1 + middle_image - 300 : X1 + middle_image + 150]
     left_image = cv2.resize(left_image, (310, 245))
     left_image = cv2.cvtColor(left_image, cv2.COLOR_BGR2GRAY)
 

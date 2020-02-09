@@ -15,6 +15,7 @@ assert float(tf.__version__[0:3]) > 2.0, ('Please Update TensorFlow')
 INDEX_FOR_TEMPLATES = 0
 PATH_TO_TEMPLATES = './dataset/template/'
 FLAGS_FIND_PREVIOUS = False
+BOX_PREVIOUS = [0, 0, 0, 0]
 
 def _draw_box_label(img, prediction_left, wings_pos_left,
                          prediction_right, wings_pos_right,
@@ -23,8 +24,6 @@ def _draw_box_label(img, prediction_left, wings_pos_left,
     Helper funciton for drawing the bounding boxes and the labels
     bbox_cv2 = [left, top, right, bottom]
     '''
-
-
     font = cv2.FONT_HERSHEY_SIMPLEX
     font_size = 0.3
     font_color = (255, 255, 255)
@@ -49,7 +48,7 @@ def _draw_box_label(img, prediction_left, wings_pos_left,
 
     return img
 
-# Show All Files  In Temp Directory
+# Show All Files In Temp Directory
 def _list_temp_directories(path: str):
     onlyfiles = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f)) if f.endswith('.bmp')]
     all_files = []
@@ -65,42 +64,52 @@ def _prediction_model(image, mode='left'):
     elif mode == 'right':
         all_pred_values = right_model.predict(image)
 
-    max_index = 0
-    all_value = 100
-
     wings_position = np.argmax(all_pred_values)
-
     prediction = all_pred_values[wings_position]
 
     wings_position += 1
-    print('Wings Position', wings_position)
+    print('Wings {} Position {}'.format(mode, wings_position))
 
     return wings_position, prediction
 
 
-def result_of_classification(index:int, templates_index=0, flags_prev=False):
-    if index == 7:
-        print('\nNot Defined')
+def result_of_classification(img, wings_pos:int, box_coord):
+    """
+        Если у нас НЕ восьмая позиция(то есть не мусор), то запоминаем координаты, которые были, на след раз
+        ИНАЧЕ смотрим были ли пред координаты, если да, то даем их
+        ЕСЛИ нет, то переключаемся на след темплате
+    """
+    global FLAGS_FIND_PREVIOUS
+    global BOX_PREVIOUS
+    if wings_pos == 8:
         print('Trash Found')
         if FLAGS_FIND_PREVIOUS:
-            print('Get Previous Coordinates')
-        global INDEX_FOR_TEMPLATES
-        INDEX_FOR_TEMPLATES += 1
-        # TODO:: Create to call next template
+            print('\nGet Previous Coordinates')
+            #FLAGS_FIND_PREVIOUS = False
+            return BOX_PREVIOUS
+        else:
+            global INDEX_FOR_TEMPLATES
+            INDEX_FOR_TEMPLATES += 1
+            find_box_temp(img)
+            print('BOX CLOSER')
+    elif wings_pos < 8 and FLAGS_FIND_PREVIOUS == False:
+        print('Check Wings')
+        BOX_PREVIOUS[0:5] = box_coord[0:5]
+        FLAGS_FIND_PREVIOUS = True
+        return BOX_PREVIOUS
     else:
-        _prediction_model(right_wings, mode='right')
+        print('OK')
+        return BOX_PREVIOUS
 
 
-
-
-def pipeline(img, template_directory):
-
+def find_box_temp(img):
     # Convert to grayscale
     imageGray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
+    # Template
     template = cv2.imread(PATH_TO_TEMPLATES + template_directory[INDEX_FOR_TEMPLATES])
-    print('Call Template №', template_directory[INDEX_FOR_TEMPLATES])
     templateGray = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
+    # print('Call Template №', template_directory[INDEX_FOR_TEMPLATES])
 
     # Find template
     result = cv2.matchTemplate(imageGray, templateGray, cv2.TM_CCOEFF)
@@ -110,16 +119,30 @@ def pipeline(img, template_directory):
     bottom_right = (top_left[0] + w, top_left[1] + h)
 
     # Track Array(Box) = [36, 235, 713, 1185]
-    box = [top_left[0], top_left[1], bottom_right[0] + 50, bottom_right[1]+50]
+    box = [top_left[0], top_left[1], bottom_right[0] + 50, bottom_right[1] + 50]
+
+    return box
+
+
+
+def pipeline(img, template_directory):
+
+    box = find_box_temp(img)
+
     left_wings, right_wings = crop_img_on_left_right(img, box)
 
     # Prediction Models
     wings_pos_left, pred_left = _prediction_model(left_wings)
     wings_pos_right, pred_right = _prediction_model(right_wings, mode='right')
 
-    # TODO::Check Wings Position if class 8
+    box_new = result_of_classification(img, wings_pos_left, box)
 
-    img = _draw_box_label(img, pred_left, wings_pos_left, pred_right, wings_pos_right, box)
+    if box_new != box:
+        left_wings, right_wings = crop_img_on_left_right(img, box_new)
+        wings_pos_left, pred_left = _prediction_model(left_wings)
+        wings_pos_right, pred_right = _prediction_model(right_wings, mode='right')
+
+    img = _draw_box_label(img, pred_left, wings_pos_left, pred_right, wings_pos_right, box_new)
 
     cv2.imshow('frame', img)
 
@@ -134,9 +157,8 @@ if __name__ == '__main__':
 
     video = cv2.VideoCapture('dataset/video/source2.avi')
 
-    # Templates
+    # Templates Directory
     template_directory = _list_temp_directories(PATH_TO_TEMPLATES)
-    print(template_directory)
 
     while(True):
         ret, img = video.read()
