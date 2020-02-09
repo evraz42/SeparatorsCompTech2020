@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using DatabaseControllerCore.DataInterfaces;
 using JetBrains.Annotations;
 
-namespace DatabaseControllerCore
+namespace DatabaseControllerCore.DatabaseTypes
 {
     [Table("public.devices")]
-    public partial class Device
+    public partial class Device : IDevice
     {
         public Device()
         {
@@ -48,7 +49,7 @@ namespace DatabaseControllerCore
                 return false;
             }
 
-            if (!deviceObj.NameDevice.Equals(NameDevice))
+            if (deviceObj.NameDevice != null && !deviceObj.NameDevice.Equals(NameDevice))
             {
                 return false;
             }
@@ -56,7 +57,7 @@ namespace DatabaseControllerCore
             {
                 return false;
             }
-            if (deviceObj.Flags.Count != Flags.Count)
+            if (deviceObj.Flags != null && deviceObj.Flags.Count != Flags.Count)
             {
                 return false;
             }
